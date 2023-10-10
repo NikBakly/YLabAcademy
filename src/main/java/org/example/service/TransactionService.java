@@ -13,9 +13,14 @@ import java.util.List;
 public class TransactionService {
     private static TransactionService instance;
 
-    private final TransactionInMemoryRepository transactionInMemoryRepository = TransactionInMemoryRepository.getInstance();
+    private final TransactionInMemoryRepository transactionInMemoryRepository;
 
     private TransactionService() {
+        this.transactionInMemoryRepository = TransactionInMemoryRepository.getInstance();
+    }
+
+    public TransactionService(TransactionInMemoryRepository transactionInMemoryRepository) {
+        this.transactionInMemoryRepository = transactionInMemoryRepository;
     }
 
     /**

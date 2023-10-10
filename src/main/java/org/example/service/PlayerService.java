@@ -13,11 +13,18 @@ import org.example.util.TransactionType;
 public class PlayerService {
     private static PlayerService instance;
 
-    private final PlayerInMemoryRepository playerInMemoryRepository = PlayerInMemoryRepository.getInstance();
-    private final TransactionService transactionService = TransactionService.getInstance();
+    private final PlayerInMemoryRepository playerInMemoryRepository;
+    private final TransactionService transactionService;
 
 
     private PlayerService() {
+        this.playerInMemoryRepository = PlayerInMemoryRepository.getInstance();
+        this.transactionService = TransactionService.getInstance();
+    }
+
+    public PlayerService(PlayerInMemoryRepository playerInMemoryRepository, TransactionService transactionService) {
+        this.playerInMemoryRepository = playerInMemoryRepository;
+        this.transactionService = transactionService;
     }
 
     /**

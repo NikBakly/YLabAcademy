@@ -4,7 +4,6 @@ import org.example.exception.InvalidInputException;
 import org.example.exception.SaveEntityException;
 import org.example.in.ConsoleReader;
 import org.example.model.Player;
-import org.example.out.ConsolePrinter;
 import org.example.service.AuditService;
 import org.example.service.PlayerService;
 import org.example.service.TransactionService;
@@ -27,12 +26,10 @@ public class PlayerConsoleController {
     private static final int CREDIT_HISTORY_CODE = 7;
     private static final int AUDIT_CODE = 8;
 
-    //TODO передалать инициализацию, сделать DI
-    private final PlayerService playerService = PlayerService.getInstance();
-    private final AuditService auditService = AuditService.getInstance();
-    private final TransactionService transactionService = TransactionService.getInstance();
-    private final ConsoleReader consoleReader = ConsoleReader.getInstance();
-    private final ConsolePrinter consolePrinter = ConsolePrinter.getInstance();
+    private final PlayerService playerService;
+    private final AuditService auditService;
+    private final TransactionService transactionService;
+    private final ConsoleReader consoleReader;
 
     /**
      * Поле для отслеживания окончания обработки пользовательских запросов
@@ -44,6 +41,20 @@ public class PlayerConsoleController {
     private Player playerNow = null;
 
     private PlayerConsoleController() {
+        playerService = PlayerService.getInstance();
+        auditService = AuditService.getInstance();
+        transactionService = TransactionService.getInstance();
+        consoleReader = ConsoleReader.getInstance();
+    }
+
+    public PlayerConsoleController(PlayerService playerService,
+                                   AuditService auditService,
+                                   TransactionService transactionService,
+                                   ConsoleReader consoleReader) {
+        this.playerService = playerService;
+        this.auditService = auditService;
+        this.transactionService = transactionService;
+        this.consoleReader = consoleReader;
     }
 
     /**
@@ -70,12 +81,12 @@ public class PlayerConsoleController {
                     processAuthorizedPlayer();
                 }
             } catch (InvalidInputException | SaveEntityException e) {
-                consolePrinter.printMessage(e.getMessage());
+                System.out.println(e.getMessage());
             } catch (Exception e) {
-                consolePrinter.printMessage(BasicPhrases.ERROR_READING_FROM_CONSOLE);
+                System.out.println(BasicPhrases.ERROR_READING_FROM_CONSOLE);
             }
         }
-        consolePrinter.printMessage(BasicPhrases.GOODBYE);
+        System.out.println(BasicPhrases.GOODBYE);
         consoleReader.close();
     }
 
@@ -85,12 +96,12 @@ public class PlayerConsoleController {
      * @throws Exception отслеживания ошибка при обработке
      */
     private void processUnauthorizedPlayer() throws Exception {
-        consolePrinter.printMessage(BasicPhrases.FOR_UNAUTHORIZED);
+        System.out.println(BasicPhrases.FOR_UNAUTHORIZED);
         int typeOperation = consoleReader.readTypeOperation();
         switch (typeOperation) {
             case EXIT_CODE -> isFinish = true;
             case REGISTRATION_CODE, AUTHORIZATION_CODE -> registerOrAuthorizePlayer(typeOperation);
-            default -> consolePrinter.printMessage(BasicPhrases.COMMAND_NOT_FOUND);
+            default -> System.out.println(BasicPhrases.COMMAND_NOT_FOUND);
         }
     }
 
@@ -100,7 +111,7 @@ public class PlayerConsoleController {
      * @throws Exception отслеживания ошибка при обработке
      */
     private void processAuthorizedPlayer() throws Exception {
-        consolePrinter.printMessage(BasicPhrases.FOR_AUTHORIZED);
+        System.out.println(BasicPhrases.FOR_AUTHORIZED);
         int typeOperation = consoleReader.readTypeOperation();
         switch (typeOperation) {
             case EXIT_CODE -> isFinish = true;
@@ -113,7 +124,7 @@ public class PlayerConsoleController {
             case DEBIT_HISTORY_CODE -> printDebitHistory();
             default -> {
                 auditService.addAudit(AuditType.ERROR_ENTERING_COMMAND, playerNow.getLogin());
-                consolePrinter.printMessage(BasicPhrases.COMMAND_NOT_FOUND);
+                System.out.println(BasicPhrases.COMMAND_NOT_FOUND);
             }
 
         }
@@ -131,7 +142,7 @@ public class PlayerConsoleController {
         if (playerNow != null) {
             previousLoginPlayer = playerNow.getLogin();
         }
-        consolePrinter.printMessage(BasicPhrases.REQUEST_LOGIN_AND_PASSWORD);
+        System.out.println(BasicPhrases.REQUEST_LOGIN_AND_PASSWORD);
         String login = consoleReader.readStringInfo();
         String password = consoleReader.readStringInfo();
         playerNow = (typeOperation == REGISTRATION_CODE) ?
@@ -151,7 +162,7 @@ public class PlayerConsoleController {
      * Метод для печати баланса игрока
      */
     private void printBalancePlayer() {
-        consolePrinter.printMessage("Ваш баланс:" + playerNow.getBalance());
+        System.out.println("Ваш баланс:" + playerNow.getBalance());
         auditService.addAudit(AuditType.BALANCE_REQUEST, playerNow.getLogin());
     }
 
@@ -161,12 +172,12 @@ public class PlayerConsoleController {
      * @throws Exception ошибка при попытке снятия средств
      */
     private void debitForPlayer() throws Exception {
-        consolePrinter.printMessage(BasicPhrases.AKS_FOR_TRANSACTION_ID);
+        System.out.println(BasicPhrases.AKS_FOR_TRANSACTION_ID);
         long transactionId = consoleReader.readTransactionId();
-        consolePrinter.printMessage(BasicPhrases.ASK_FOR_DEBIT_SIZE);
+        System.out.println(BasicPhrases.ASK_FOR_DEBIT_SIZE);
         double debitSize = consoleReader.readDoubleNumber();
         playerService.debitForPlayer(playerNow, transactionId, debitSize);
-        consolePrinter.printMessage(BasicPhrases.SUCCESSFUL_OPERATION);
+        System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
         auditService.addAudit(AuditType.DEBIT, playerNow.getLogin());
     }
 
@@ -176,12 +187,12 @@ public class PlayerConsoleController {
      * @throws Exception ошибка при попытке пополнения средств
      */
     private void creditForPlayer() throws Exception {
-        consolePrinter.printMessage(BasicPhrases.AKS_FOR_TRANSACTION_ID);
+        System.out.println(BasicPhrases.AKS_FOR_TRANSACTION_ID);
         long transactionId = consoleReader.readTransactionId();
-        consolePrinter.printMessage(BasicPhrases.ASK_FOR_DEBIT_SIZE);
+        System.out.println(BasicPhrases.ASK_FOR_DEBIT_SIZE);
         double creditSize = consoleReader.readDoubleNumber();
         playerService.creditForPlayer(playerNow, transactionId, creditSize);
-        consolePrinter.printMessage(BasicPhrases.SUCCESSFUL_OPERATION);
+        System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
         auditService.addAudit(AuditType.CREDIT, playerNow.getLogin());
     }
 

@@ -11,8 +11,8 @@ public class AuditService {
 
     private final AuditInMemoryRepository auditInMemoryRepository;
 
-    public AuditService() {
-        auditInMemoryRepository = AuditInMemoryRepository.getInstance();
+    private AuditService() {
+        this.auditInMemoryRepository = AuditInMemoryRepository.getInstance();
     }
 
     public AuditService(AuditInMemoryRepository auditInMemoryRepository) {

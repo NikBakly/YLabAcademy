@@ -19,7 +19,7 @@ public class AuditInMemoryRepository {
     private final Map<Long, Audit> audits;
     private long nextId;
 
-    public AuditInMemoryRepository() {
+    private AuditInMemoryRepository() {
         audits = new HashMap<>();
         nextId = 1L;
     }
