@@ -1,13 +1,12 @@
 package org.example;
 
+import org.example.in.contoller.PlayerConsoleController;
+
 /**
- * Hello world!
- *
+ * Класс app является точкой входа
  */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+public class App {
+    public static void main(String[] args) throws Exception {
+        PlayerConsoleController.getInstance().start();
     }
 }
