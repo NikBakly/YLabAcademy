@@ -18,7 +18,7 @@ public class PlayerService {
 
 
     private PlayerService() {
-        this.playerInMemoryRepository = PlayerInMemoryRepository.getInstance();
+        this.playerInMemoryRepository = new PlayerInMemoryRepository();
         this.transactionService = TransactionService.getInstance();
     }
 
@@ -77,52 +77,53 @@ public class PlayerService {
     }
 
     /**
-     * Метод для выполнения дебит(списание средств) операции для игрока.
+     * Метод для выполнения дебит(списание средств) операции по логину игрока.
      *
-     * @param player        игрок, к которому будет выполнена операция дебит.
+     * @param loginPlayer   логин игрока, к которому будет выполнена операция дебит.
      * @param transactionId уникальный id транзакции.
      * @param debitSize     размер средств для списания.
      * @throws RuntimeException ошибка при не выполненной операции.
      */
-    public void debitForPlayer(Player player, long transactionId, double debitSize) throws RuntimeException {
-        checkPlayer(player);
-        double balancePlayer = player.getBalance();
+    public void debitForPlayer(String loginPlayer, long transactionId, double debitSize) throws RuntimeException {
+        Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
+        double balancePlayer = foundPlayer.getBalance();
         if (balancePlayer < debitSize) {
             throw new InvalidInputException("У вас нету столько средств на балансе.");
         }
-        transactionService.createTransaction(transactionId, TransactionType.DEBIT, debitSize, player.getLogin());
-        player.setBalance(balancePlayer - debitSize);
+        transactionService.createTransaction(transactionId, TransactionType.DEBIT, debitSize, foundPlayer.getLogin());
+        foundPlayer.setBalance(balancePlayer - debitSize);
     }
 
     /**
-     * Метод для выполнения кредит(пополнения средств) операции для игрока.
+     * Метод для выполнения кредит(пополнения средств) операции по логину игрока.
      *
-     * @param player        игрок, к которому будет выполнена операция дебит.
+     * @param loginPlayer   логин игрока, к которому будет выполнена операция дебит.
      * @param transactionId уникальный id транзакции.
      * @param creditSize    размер средств для пополнения.
      * @throws RuntimeException ошибка при не выполненной операции.
      */
-    public void creditForPlayer(Player player, long transactionId, double creditSize) throws RuntimeException {
-        checkPlayer(player);
-        double balancePlayer = player.getBalance();
+    public void creditForPlayer(String loginPlayer, long transactionId, double creditSize) throws RuntimeException {
+        Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
+        double balancePlayer = foundPlayer.getBalance();
         if (Double.isInfinite(balancePlayer + creditSize)) {
-            throw new InvalidInputException("У вас будет слишком большой баланс. " +
-                    "Обратитесь в тех. поддержку для решения данного вопроса!");
+            throw new InvalidInputException("Уменьшите размер кредита");
         }
-        transactionService.createTransaction(transactionId, TransactionType.CREDIT, creditSize, player.getLogin());
-        player.setBalance(balancePlayer + creditSize);
+        transactionService.createTransaction(transactionId, TransactionType.CREDIT, creditSize, foundPlayer.getLogin());
+        foundPlayer.setBalance(balancePlayer + creditSize);
     }
 
     /**
-     * Метод для проверки игрока на существование и на пустоту.
+     * Метод для проверки и нахождения игрока на существование по логину.
      *
-     * @param player передаваемый объект для проверки
+     * @param loginPlayer передаваемый объект для проверки
      * @throws NotFoundException ошибка, если объект игрока не прошел проверку
      */
-    private void checkPlayer(Player player) throws NotFoundException {
-        if (player == null || playerInMemoryRepository.findByLogin(player.getLogin()) == null) {
-            throw new NotFoundException("Игрок не найден или передана пустота");
+    private Player findAndCheckPlayerByLogin(String loginPlayer) throws NotFoundException {
+        Player foundPlayer = playerInMemoryRepository.findByLogin(loginPlayer);
+        if (foundPlayer == null) {
+            throw new NotFoundException("Игрок не найден.");
         }
+        return foundPlayer;
     }
 
     /**

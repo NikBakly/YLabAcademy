@@ -16,7 +16,7 @@ public class TransactionService {
     private final TransactionInMemoryRepository transactionInMemoryRepository;
 
     private TransactionService() {
-        this.transactionInMemoryRepository = TransactionInMemoryRepository.getInstance();
+        this.transactionInMemoryRepository = new TransactionInMemoryRepository();
     }
 
     public TransactionService(TransactionInMemoryRepository transactionInMemoryRepository) {

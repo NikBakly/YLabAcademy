@@ -175,7 +175,7 @@ public class PlayerConsoleController {
         long transactionId = consoleReader.readTransactionId();
         System.out.println(BasicPhrases.ASK_FOR_DEBIT_SIZE);
         double debitSize = consoleReader.readDoubleNumber();
-        playerService.debitForPlayer(playerNow, transactionId, debitSize);
+        playerService.debitForPlayer(playerNow.getLogin(), transactionId, debitSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
         auditService.addAudit(AuditType.DEBIT, playerNow.getLogin());
     }
@@ -190,7 +190,7 @@ public class PlayerConsoleController {
         long transactionId = consoleReader.readTransactionId();
         System.out.println(BasicPhrases.ASK_FOR_DEBIT_SIZE);
         double creditSize = consoleReader.readDoubleNumber();
-        playerService.creditForPlayer(playerNow, transactionId, creditSize);
+        playerService.creditForPlayer(playerNow.getLogin(), transactionId, creditSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
         auditService.addAudit(AuditType.CREDIT, playerNow.getLogin());
     }

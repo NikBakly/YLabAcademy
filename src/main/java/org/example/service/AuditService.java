@@ -15,7 +15,7 @@ public class AuditService {
     private final AuditInMemoryRepository auditInMemoryRepository;
 
     private AuditService() {
-        this.auditInMemoryRepository = AuditInMemoryRepository.getInstance();
+        this.auditInMemoryRepository = new AuditInMemoryRepository();
     }
 
     public AuditService(AuditInMemoryRepository auditInMemoryRepository) {
@@ -52,6 +52,4 @@ public class AuditService {
     public List<Audit> findAuditsByLoginPlayer(String login) {
         return auditInMemoryRepository.findAuditsByLoginPlayerByCreatedTime(login);
     }
-
-
 }
