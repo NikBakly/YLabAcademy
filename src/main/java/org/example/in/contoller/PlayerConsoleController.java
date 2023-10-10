@@ -47,16 +47,6 @@ public class PlayerConsoleController {
         consoleReader = ConsoleReader.getInstance();
     }
 
-    public PlayerConsoleController(PlayerService playerService,
-                                   AuditService auditService,
-                                   TransactionService transactionService,
-                                   ConsoleReader consoleReader) {
-        this.playerService = playerService;
-        this.auditService = auditService;
-        this.transactionService = transactionService;
-        this.consoleReader = consoleReader;
-    }
-
     /**
      * Метод для реализации шаблона проектирования Singleton.
      *
@@ -188,7 +178,7 @@ public class PlayerConsoleController {
     private void creditForPlayer() throws Exception {
         System.out.println(BasicPhrases.AKS_FOR_TRANSACTION_ID);
         long transactionId = consoleReader.readTransactionId();
-        System.out.println(BasicPhrases.ASK_FOR_DEBIT_SIZE);
+        System.out.println(BasicPhrases.ASK_FOR_CREDIT_SIZE);
         double creditSize = consoleReader.readDoubleNumber();
         playerService.creditForPlayer(playerNow.getLogin(), transactionId, creditSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
