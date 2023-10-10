@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 /**
  * Класс для чтения данных из консоли.
- * Имплементация AutoCloseable нужна для закрытия потока BufferReader
+ * Имплементация AutoCloseable нужна для автоматического закрытия в try-with-resources потока BufferReader
  */
 public class ConsoleReader implements AutoCloseable {
     private static ConsoleReader instance;
