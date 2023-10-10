@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Класс для хранения сущности Player в памяти компьютера
+ * Класс для хранения сущности Player в памяти компьютера.
  */
 public class PlayerInMemoryRepository {
     private static PlayerInMemoryRepository instance;
 
     /**
-     * Коллекция для хранения игроков login игрока - сущность игрока
+     * Коллекция для хранения игроков login игрока - сущность игрока.
      */
     private final Map<String, Player> players;
 
@@ -23,7 +23,7 @@ public class PlayerInMemoryRepository {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность PlayerInMemoryRepository
      */
@@ -35,29 +35,29 @@ public class PlayerInMemoryRepository {
     }
 
     /**
-     * Метод для сохранения сущности в память
+     * Метод для сохранения сущности в память.
      *
-     * @param login    логин игрока
-     * @param password пароль игрока
+     * @param loginPlayer логин игрока
+     * @param password    пароль игрока
      * @return созданный игрок
      * @throws SaveEntityException если переданный логин уже существует
      */
-    public Player save(String login, String password) throws SaveEntityException {
-        if (players.containsKey(login)) {
+    public Player save(String loginPlayer, String password) throws SaveEntityException {
+        if (players.containsKey(loginPlayer)) {
             throw new SaveEntityException("Игрок с таким логином существует!");
         }
-        Player newPlayer = new Player(login, password);
-        players.put(login, newPlayer);
+        Player newPlayer = new Player(loginPlayer, password);
+        players.put(loginPlayer, newPlayer);
         return newPlayer;
     }
 
     /**
-     * Нахождения игрока по его логину
+     * Нахождения игрока по его логину.
      *
-     * @param login логин игрока
+     * @param loginPlayer логин игрока
      * @return найденный игрок или null, если игрок не найден.
      */
-    public Player findByLogin(String login) {
-        return players.getOrDefault(login, null);
+    public Player findByLogin(String loginPlayer) {
+        return players.getOrDefault(loginPlayer, null);
     }
 }

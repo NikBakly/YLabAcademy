@@ -1,5 +1,8 @@
 package org.example.model;
 
+/**
+ * Сущность Player.
+ */
 public class Player {
     private final String login;
     private final String password;

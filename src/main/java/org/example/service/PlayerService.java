@@ -8,7 +8,7 @@ import org.example.repository.PlayerInMemoryRepository;
 import org.example.util.TransactionType;
 
 /**
- * Класс ответственный за бизнес-логику для сущности Player
+ * Класс ответственный за бизнес-логику для сущности Player.
  */
 public class PlayerService {
     private static PlayerService instance;
@@ -28,7 +28,7 @@ public class PlayerService {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность PlayerService
      */
@@ -114,7 +114,7 @@ public class PlayerService {
     }
 
     /**
-     * Метод для проверки игрока на существование и на пустоту
+     * Метод для проверки игрока на существование и на пустоту.
      *
      * @param player передаваемый объект для проверки
      * @throws NotFoundException ошибка, если объект игрока не прошел проверку

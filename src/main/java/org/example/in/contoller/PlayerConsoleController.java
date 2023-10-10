@@ -11,7 +11,7 @@ import org.example.util.AuditType;
 import org.example.util.BasicPhrases;
 
 /**
- * Класс, который ответственный за обработку поступающих запросов
+ * Класс, который ответственный за обработку поступающих запросов.
  */
 public class PlayerConsoleController {
     private static PlayerConsoleController instance;
@@ -32,11 +32,11 @@ public class PlayerConsoleController {
     private final ConsoleReader consoleReader;
 
     /**
-     * Поле для отслеживания окончания обработки пользовательских запросов
+     * Поле для отслеживания окончания обработки пользовательских запросов.
      */
     private boolean isFinish = false;
     /**
-     * Поле для отслеживания авторизованного игрока
+     * Поле для отслеживания авторизованного игрока.
      */
     private Player playerNow = null;
 
@@ -58,7 +58,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность PlayerConsoleController
      */
@@ -70,7 +70,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод запускающий цикл для обработки запросов пользователя
+     * Метод запускающий цикл для обработки запросов пользователя.
      */
     public void start() throws Exception {
         while (!isFinish) {
@@ -91,7 +91,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для обработки не авторизованного игрока
+     * Метод для обработки не авторизованного игрока.
      *
      * @throws Exception отслеживания ошибка при обработке
      */
@@ -106,7 +106,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для обработки авторизованного игрока
+     * Метод для обработки авторизованного игрока.
      *
      * @throws Exception отслеживания ошибка при обработке
      */
@@ -131,10 +131,9 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для авторизации или регистрации игрока
+     * Метод для авторизации или регистрации игрока.
      *
      * @param typeOperation тип операции пользователя
-     * @return авторизированный или зарегистрированный игрок
      * @throws Exception ошибка при попытке авторизации
      */
     private void registerOrAuthorizePlayer(int typeOperation) throws Exception {
@@ -159,7 +158,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для печати баланса игрока
+     * Метод для печати баланса игрока.
      */
     private void printBalancePlayer() {
         System.out.println("Ваш баланс:" + playerNow.getBalance());
@@ -167,7 +166,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для снятия средств у игрока
+     * Метод для снятия средств у игрока.
      *
      * @throws Exception ошибка при попытке снятия средств
      */
@@ -182,7 +181,7 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для пополнения средства
+     * Метод для пополнения средства.
      *
      * @throws Exception ошибка при попытке пополнения средств
      */
@@ -196,17 +195,26 @@ public class PlayerConsoleController {
         auditService.addAudit(AuditType.CREDIT, playerNow.getLogin());
     }
 
+    /**
+     * Метод выводит в консоль историю пополнений.
+     */
     private void printCreditHistory() {
         System.out.println(transactionService.getCreditHistoryTransactions(playerNow.getLogin()));
         auditService.addAudit(AuditType.REQUEST_CREDIT_HISTORY, playerNow.getLogin());
 
     }
 
+    /**
+     * Метод выводит в консоль историю снятия.
+     */
     private void printDebitHistory() {
         System.out.println(transactionService.getDebitHistoryTransactions(playerNow.getLogin()));
         auditService.addAudit(AuditType.REQUEST_DEBIT_HISTORY, playerNow.getLogin());
     }
 
+    /**
+     * Метод выводит в консоль историю действий игрока.
+     */
     private void printAudit() {
         System.out.println(auditService.findAuditsByLoginPlayer(playerNow.getLogin()));
     }

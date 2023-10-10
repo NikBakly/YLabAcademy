@@ -8,7 +8,7 @@ import org.example.util.TransactionType;
 import java.util.List;
 
 /**
- * Класс ответственный за бизнес-логику для сущности Transaction
+ * Класс ответственный за бизнес-логику для сущности Transaction.
  */
 public class TransactionService {
     private static TransactionService instance;
@@ -24,7 +24,7 @@ public class TransactionService {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность TransactionService
      */
@@ -35,15 +35,39 @@ public class TransactionService {
         return instance;
     }
 
-    public void createTransaction(Long transactionId, TransactionType type, Double size, String loginPlayer) throws SaveEntityException {
-        transactionInMemoryRepository.createdTransaction(transactionId, type, size, loginPlayer);
+    /**
+     * Метод для создания транзакции.
+     *
+     * @param transactionId   уникальное id транзакции
+     * @param transactionType тип транзакции
+     * @param size            размер транзакции
+     * @param loginPlayer     логин игрока
+     * @throws SaveEntityException ошибка при попытке создания транзакции
+     */
+    public void createTransaction(Long transactionId,
+                                  TransactionType transactionType,
+                                  Double size,
+                                  String loginPlayer) throws SaveEntityException {
+        transactionInMemoryRepository.createdTransaction(transactionId, transactionType, size, loginPlayer);
     }
 
-    public List<Transaction> getCreditHistoryTransactions(String login) {
-        return transactionInMemoryRepository.getCreditHistoryTransactionsByCreatedTime(login);
+    /**
+     * Метод запрашивает все транзакций типа CREDIT по логину игрока и отсортированный по времени у репозитория.
+     *
+     * @param loginPlayer логин игрока
+     * @return список всех транзакций типа CREDIT по логину игрока и отсортированный по времени
+     */
+    public List<Transaction> getCreditHistoryTransactions(String loginPlayer) {
+        return transactionInMemoryRepository.findCreditHistoryTransactionsByCreatedTime(loginPlayer);
     }
 
-    public List<Transaction> getDebitHistoryTransactions(String login) {
-        return transactionInMemoryRepository.getDebitHistoryTransactionsByCreatedTime(login);
+    /**
+     * Метод запрашивает все транзакций типа DEBIT по логину игрока и отсортированный по времени у репозитория.
+     *
+     * @param loginPlayer логин игрока
+     * @return список всех транзакций типа DEBIT по логину игрока и отсортированный по времени
+     */
+    public List<Transaction> getDebitHistoryTransactions(String loginPlayer) {
+        return transactionInMemoryRepository.findDebitHistoryTransactionsByCreatedTime(loginPlayer);
     }
 }

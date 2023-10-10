@@ -6,6 +6,9 @@ import org.example.util.AuditType;
 
 import java.util.List;
 
+/**
+ * Класс ответственный за бизнес-логику для сущности Audit.
+ */
 public class AuditService {
     private static AuditService instance;
 
@@ -20,7 +23,7 @@ public class AuditService {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность AuditService
      */
@@ -31,14 +34,20 @@ public class AuditService {
         return instance;
     }
 
+    /**
+     * Метод для сохранения аудита.
+     *
+     * @param auditType   тип аудита
+     * @param loginPlayer логин игрока, который был инициатором создания аудита
+     */
     public void addAudit(AuditType auditType, String loginPlayer) {
         auditInMemoryRepository.addAudit(auditType, loginPlayer);
     }
 
     /**
-     * Метод для нахождения всех аудитов игрока по его логину
+     * Метод для нахождения всех аудитов игрока по его логину.
      *
-     * @param login логин игрока
+     * @param login логин игрока, который был инициатором создания аудита
      */
     public List<Audit> findAuditsByLoginPlayer(String login) {
         return auditInMemoryRepository.findAuditsByLoginPlayerByCreatedTime(login);

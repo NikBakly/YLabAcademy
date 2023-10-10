@@ -11,11 +11,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Класс отвечающий за хранение сущности Audit
+ * Класс для хранения сущности Audit в памяти компьютера.
  */
 public class AuditInMemoryRepository {
     private static AuditInMemoryRepository instance;
 
+    /**
+     * Коллекция для хранения аудита по их id.
+     */
     private final Map<Long, Audit> audits;
     private long nextId;
 
@@ -25,7 +28,7 @@ public class AuditInMemoryRepository {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность AuditService
      */
@@ -36,15 +39,27 @@ public class AuditInMemoryRepository {
         return instance;
     }
 
+    /**
+     * Метод для добавления аудита.
+     *
+     * @param auditType   тип
+     * @param loginPlayer логин игрока
+     */
     public void addAudit(AuditType auditType, String loginPlayer) {
         Audit newAudit = new Audit(nextId, auditType, loginPlayer, Instant.now());
         audits.put(nextId, newAudit);
         ++nextId;
     }
 
-    public List<Audit> findAuditsByLoginPlayerByCreatedTime(String login) {
+    /**
+     * Метод для нахождения всех аудитов игрока.
+     *
+     * @param loginPlayer логин игрока
+     * @return список всех аудитов по логину игрока и отсортированный по времени
+     */
+    public List<Audit> findAuditsByLoginPlayerByCreatedTime(String loginPlayer) {
         return audits.values().stream()
-                .filter(audit -> audit.loginPlayer().equals(login))
+                .filter(audit -> audit.loginPlayer().equals(loginPlayer))
                 .sorted(Comparator.comparing(Audit::createdTime))
                 .collect(Collectors.toList());
     }

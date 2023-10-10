@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 /**
  * Класс для чтения данных из консоли.
- * Имплементация AutoCloseable нужна для автоматического закрытия в try-with-resources потока BufferReader
+ * Имплементация AutoCloseable нужна для автоматического закрытия в try-with-resources потока BufferReader.
  */
 public class ConsoleReader implements AutoCloseable {
     private static ConsoleReader instance;
@@ -17,7 +17,7 @@ public class ConsoleReader implements AutoCloseable {
     }
 
     /**
-     * Метод для реализации шаблона проектирования Singleton
+     * Метод для реализации шаблона проектирования Singleton.
      *
      * @return сущность ConsoleReader
      */
@@ -29,33 +29,50 @@ public class ConsoleReader implements AutoCloseable {
     }
 
     /**
-     * Метод для определения типы операции из консоли
+     * Метод для чтения типа операции из консоли.
      *
      * @return вид операции
-     * @throws IOException если возникла ошибка при чтении данных
+     * @throws IOException ошибка при чтении данных
      */
     public int readTypeOperation() throws IOException {
         return Integer.parseInt(reader.readLine());
     }
 
     /**
-     * Метод для определения вводимой информации из консоли
+     * Метод для чтения информации из консоли.
      *
-     * @return введенная информация
-     * @throws IOException если возникла ошибка при чтении данных
+     * @return информация
+     * @throws IOException ошибка при чтении данных
      */
     public String readStringInfo() throws IOException {
         return reader.readLine();
     }
 
+    /**
+     * Метод для чтения идентификатора транзакции.
+     *
+     * @return идентификатор транзакции
+     * @throws IOException ошибка при чтении данных
+     */
     public long readTransactionId() throws IOException {
         return Long.parseLong(reader.readLine());
     }
 
+    /**
+     * Метод для чтения числа с плавающей точкой.
+     *
+     * @return число с плавающей точкой
+     * @throws IOException ошибка при чтении данных
+     */
     public double readDoubleNumber() throws IOException {
         return Double.parseDouble(reader.readLine());
     }
 
+    /**
+     * Метод для закрытия потока BufferReader.
+     *
+     * @throws Exception ошибка при попытке закрытия потока
+     */
     @Override
     public void close() throws Exception {
         reader.close();

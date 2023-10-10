@@ -1,5 +1,8 @@
 package org.example.util;
 
+/**
+ * Этот enum хранит текстовые заготовки для общения с пользователем
+ */
 public enum BasicPhrases {
     FOR_UNAUTHORIZED("""
             Приветствует НИК - управленец твоими транзакциями!

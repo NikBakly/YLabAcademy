@@ -1,5 +1,8 @@
 package org.example.util;
 
+/**
+ * Этот enum хранит основные тип аудитов
+ */
 public enum AuditType {
     REGISTRATION,
     AUTHORIZATION,
