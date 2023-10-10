@@ -2,40 +2,33 @@ package org.example.repository;
 
 import org.example.exception.SaveEntityException;
 import org.example.model.Player;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 /**
  * Класс для тестирования PlayerInMemoryRepository
  */
 class PlayerInMemoryRepositoryTest {
-    static PlayerInMemoryRepository repository;
+    PlayerInMemoryRepository repository;
+    static String expectedLoginPlayer;
+    static String expectedPasswordPlayer;
 
     @BeforeAll
     static void init() {
-        repository = PlayerInMemoryRepository.getInstance();
+        expectedLoginPlayer = "test";
+        expectedPasswordPlayer = "test";
     }
 
-    /**
-     * Тестирование шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Тест 1. Проверка шаблона проектирования Singleton.")
-    void getInstance() {
-        PlayerInMemoryRepository secondPointer = PlayerInMemoryRepository.getInstance();
-        Assertions.assertSame(repository, secondPointer, "Указатели ссылаются на разные объекты.");
+    @BeforeEach
+    void initRepository() {
+        repository = new PlayerInMemoryRepository();
     }
 
     /**
      * Тестирование создания и нахождения игрока по его логину
      */
     @Test
-    @DisplayName("Тест 2. Проверка создания и нахождения игрока по его логину")
+    @DisplayName("Тест 1. Удачное создание и нахождения игрока по его логину")
     void saveAndFindPlayerByLogin() {
-        String expectedLoginPlayer = "test";
-        String expectedPasswordPlayer = "test";
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Player foundPlayer = repository.findByLogin(expectedLoginPlayer);
         Assertions.assertEquals(expectedLoginPlayer, foundPlayer.getLogin(), "Логины не равны");
@@ -46,10 +39,8 @@ class PlayerInMemoryRepositoryTest {
      * Тестирование создания игрока с не уникальным логином
      */
     @Test
-    @DisplayName("Тест 3. Попытка создания игрока с не уникальным логином")
+    @DisplayName("Тест 2. Не удачное создания игрока с не уникальным логином")
     void savePlayerWhenLoginNotUnique() {
-        String expectedLoginPlayer = "loginTest";
-        String expectedPasswordPlayer = "passwordTest";
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         SaveEntityException exception = Assertions.assertThrows(SaveEntityException.class, () ->
                 repository.save(expectedLoginPlayer, expectedPasswordPlayer));

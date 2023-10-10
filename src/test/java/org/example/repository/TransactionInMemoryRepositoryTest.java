@@ -3,40 +3,32 @@ package org.example.repository;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
 import org.example.util.TransactionType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 /**
  * Класс для тестирования TransactionInMemoryRepository
  */
 class TransactionInMemoryRepositoryTest {
     static TransactionInMemoryRepository repository;
-    Double sizeTransaction = 120.0;
-    String loginPlayer = "tester";
-
+    static Double sizeTransaction;
+    static String loginPlayer;
 
     @BeforeAll
     static void init() {
-        repository = TransactionInMemoryRepository.getInstance();
+        sizeTransaction = 120.0;
+        loginPlayer = "tester";
     }
 
-    /**
-     * Тестирование шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Тест 1. Проверка шаблона проектирования Singleton.")
-    void getInstance() {
-        TransactionInMemoryRepository secondPointer = TransactionInMemoryRepository.getInstance();
-        Assertions.assertSame(repository, secondPointer, "Указатели ссылаются на разные объекты.");
+    @BeforeEach
+    void initRepository() {
+        repository = new TransactionInMemoryRepository();
     }
 
     /**
      * Тестирование создания транзакций типа CREDIT и показ истории таких транзакций
      */
     @Test
-    @DisplayName("Тест 2. Создание транзакции типа CREDIT и нахождения ее по логину пользователя.")
+    @DisplayName("Тест 1. Удачное создание транзакции типа CREDIT и нахождения ее по логину пользователя.")
     void createdTransactionAndFindCreditHistoryTransactions() {
         Long uniqueTransactionId = 1L;
         TransactionType transactionType = TransactionType.CREDIT;
@@ -54,7 +46,7 @@ class TransactionInMemoryRepositoryTest {
      * Тестирование создания транзакций типа DEBIT и показ истории таких транзакций
      */
     @Test
-    @DisplayName("Тест 3. Создание транзакции типа DEBIT и нахождения ее по логину пользователя.")
+    @DisplayName("Тест 2. Удачное создание транзакции типа DEBIT и нахождения ее по логину пользователя.")
     void createdTransactionAndFindDebitHistoryTransactions() {
         Long uniqueTransactionId = 2L;
         TransactionType transactionType = TransactionType.DEBIT;
@@ -71,7 +63,7 @@ class TransactionInMemoryRepositoryTest {
      * Тестирование создания транзакции с не уникальном id
      */
     @Test
-    @DisplayName("Тест 4. Создание транзакции с не уникальным id.")
+    @DisplayName("Тест 3. Не удачное создание транзакции с не уникальным id.")
     void createdDebitTransactionWhenTransactionSizeIsLargerThanPlayerPersonalFund() {
         Long repeatingId = 3L;
         repository.createdTransaction(repeatingId, TransactionType.CREDIT, sizeTransaction, loginPlayer);
@@ -80,5 +72,4 @@ class TransactionInMemoryRepositoryTest {
         String expectedErrorMessage = "Id транзакции не является уникальным!";
         Assertions.assertEquals(expectedErrorMessage, exception.getMessage());
     }
-
 }

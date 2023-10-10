@@ -3,7 +3,7 @@ package org.example.repository;
 import org.example.model.Audit;
 import org.example.util.AuditType;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,28 +13,18 @@ import java.util.List;
  * Класс для тестирования AuditInMemoryRepository
  */
 class AuditInMemoryRepositoryTest {
-    static AuditInMemoryRepository repository;
+    AuditInMemoryRepository repository;
 
-    @BeforeAll
-    static void init() {
-        repository = AuditInMemoryRepository.getInstance();
-    }
-
-    /**
-     * Тест для проверки шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Тест 1. Проверка шаблона проектирования Singleton.")
-    void getInstance() {
-        AuditInMemoryRepository secondPointer = AuditInMemoryRepository.getInstance();
-        Assertions.assertSame(repository, secondPointer, "Указатели ссылаются на разные объекты.");
+    @BeforeEach
+    void init() {
+        repository = new AuditInMemoryRepository();
     }
 
     /**
      * Тест для проверки сохранений различных аудитов и последующего их нахождения по логину игрока.
      */
     @Test
-    @DisplayName("Тест 2. Проверка создания аудитов и их нахождения по логину игрока")
+    @DisplayName("Тест 1. Удачное создание аудитов и их нахождения по логину игрока")
     void addAndFindAuditsByLoginPlayer() {
         String loginPlayer = "tester";
         // заполняем различными действиями пользователя
