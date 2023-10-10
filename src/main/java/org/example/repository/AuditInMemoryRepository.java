@@ -22,22 +22,11 @@ public class AuditInMemoryRepository {
     private final Map<Long, Audit> audits;
     private long nextId;
 
-    private AuditInMemoryRepository() {
+    public AuditInMemoryRepository() {
         audits = new HashMap<>();
         nextId = 1L;
     }
 
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность AuditService
-     */
-    public static AuditInMemoryRepository getInstance() {
-        if (instance == null) {
-            instance = new AuditInMemoryRepository();
-        }
-        return instance;
-    }
 
     /**
      * Метод для добавления аудита.

@@ -22,21 +22,10 @@ public class TransactionInMemoryRepository {
      */
     private final Map<Long, Transaction> transactions;
 
-    private TransactionInMemoryRepository() {
+    public TransactionInMemoryRepository() {
         transactions = new HashMap<>();
     }
 
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность TransactionInMemoryRepository
-     */
-    public static TransactionInMemoryRepository getInstance() {
-        if (instance == null) {
-            instance = new TransactionInMemoryRepository();
-        }
-        return instance;
-    }
 
     /**
      * Метод для создания транзакции.
@@ -47,7 +36,10 @@ public class TransactionInMemoryRepository {
      * @param loginPlayer     логин игрока
      * @throws SaveEntityException ошибка при попытке создания транзакции
      */
-    public void createdTransaction(Long transactionId, TransactionType transactionType, Double size, String loginPlayer) throws SaveEntityException {
+    public void createdTransaction(Long transactionId,
+                                   TransactionType transactionType,
+                                   Double size,
+                                   String loginPlayer) throws SaveEntityException {
         if (transactions.containsKey(transactionId)) {
             throw new SaveEntityException("Id транзакции не является уникальным!");
         }

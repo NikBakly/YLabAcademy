@@ -18,21 +18,10 @@ public class PlayerInMemoryRepository {
     private final Map<String, Player> players;
 
 
-    private PlayerInMemoryRepository() {
+    public PlayerInMemoryRepository() {
         players = new HashMap<>();
     }
 
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность PlayerInMemoryRepository
-     */
-    public static PlayerInMemoryRepository getInstance() {
-        if (instance == null) {
-            instance = new PlayerInMemoryRepository();
-        }
-        return instance;
-    }
 
     /**
      * Метод для сохранения сущности в память.
