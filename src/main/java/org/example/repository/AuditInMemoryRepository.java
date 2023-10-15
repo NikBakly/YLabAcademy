@@ -4,52 +4,39 @@ import org.example.model.Audit;
 import org.example.util.AuditType;
 
 import java.time.Instant;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Класс для хранения сущности Audit в памяти компьютера.
  */
-public class AuditInMemoryRepository {
-    private static AuditInMemoryRepository instance;
+public class AuditInMemoryRepository implements AuditRepository {
 
     /**
-     * Коллекция для хранения аудита по их id.
+     * Коллекция для хранения аудита по loginPlayer.
      */
-    private final Map<Long, Audit> audits;
-    private long nextId;
+    private final Map<String, List<Audit>> audits;
 
     public AuditInMemoryRepository() {
         audits = new HashMap<>();
-        nextId = 1L;
     }
 
 
-    /**
-     * Метод для добавления аудита.
-     *
-     * @param auditType   тип
-     * @param loginPlayer логин игрока
-     */
+    @Override
     public void addAudit(AuditType auditType, String loginPlayer) {
-        Audit newAudit = new Audit(nextId, auditType, loginPlayer, Instant.now());
-        audits.put(nextId, newAudit);
-        ++nextId;
+        Audit newAudit = new Audit(auditType, loginPlayer, Instant.now());
+        List<Audit> foundAuditsByLoginPlayer = audits.getOrDefault(loginPlayer, null);
+        if (foundAuditsByLoginPlayer == null) {
+            foundAuditsByLoginPlayer = new ArrayList<>();
+        }
+        foundAuditsByLoginPlayer.add(newAudit);
+        audits.put(loginPlayer, foundAuditsByLoginPlayer);
     }
 
-    /**
-     * Метод для нахождения всех аудитов игрока.
-     *
-     * @param loginPlayer логин игрока
-     * @return список всех аудитов по логину игрока и отсортированный по времени
-     */
+    @Override
     public List<Audit> findAuditsByLoginPlayerByCreatedTime(String loginPlayer) {
-        return audits.values().stream()
-                .filter(audit -> audit.loginPlayer().equals(loginPlayer))
-                .sorted(Comparator.comparing(Audit::createdTime))
-                .collect(Collectors.toList());
+        return audits.get(loginPlayer);
     }
 }

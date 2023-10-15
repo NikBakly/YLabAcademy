@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Класс для хранения сущности Transaction в памяти компьютера.
  */
-public class TransactionInMemoryRepository {
-    private static TransactionInMemoryRepository instance;
+public class TransactionInMemoryRepository implements TransactionRepository {
 
     /**
      * Коллекция для хранения транзакций по их id.
@@ -26,16 +25,7 @@ public class TransactionInMemoryRepository {
         transactions = new HashMap<>();
     }
 
-
-    /**
-     * Метод для создания транзакции.
-     *
-     * @param transactionId   уникальное id транзакции
-     * @param transactionType тип транзакции
-     * @param size            размер транзакции
-     * @param loginPlayer     логин игрока
-     * @throws SaveEntityException ошибка при попытке создания транзакции
-     */
+    @Override
     public void createdTransaction(Long transactionId,
                                    TransactionType transactionType,
                                    Double size,
@@ -47,12 +37,7 @@ public class TransactionInMemoryRepository {
         transactions.put(transactionId, newTransaction);
     }
 
-    /**
-     * Метод для нахождения всех транзакций типа CREDIT по логину игрока и отсортированный по времени.
-     *
-     * @param loginPlayer логин игрока
-     * @return список всех транзакций типа CREDIT по логину игрока и отсортированный по времени
-     */
+    @Override
     public List<Transaction> findCreditHistoryTransactionsByCreatedTime(String loginPlayer) {
         return transactions.values().stream()
                 .filter(transaction -> transaction.loginPlayer().equals(loginPlayer))
@@ -61,12 +46,7 @@ public class TransactionInMemoryRepository {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Метод для нахождения всех транзакций типа DEBIT по логину игрока и отсортированный по времени.
-     *
-     * @param loginPlayer логин игрока
-     * @return список всех транзакций типа DEBIT по логину игрока и отсортированный по времени
-     */
+    @Override
     public List<Transaction> findDebitHistoryTransactionsByCreatedTime(String loginPlayer) {
         return transactions.values().stream()
                 .filter(transaction -> transaction.loginPlayer().equals(loginPlayer))

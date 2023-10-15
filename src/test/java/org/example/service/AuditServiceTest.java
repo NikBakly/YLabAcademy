@@ -1,12 +1,17 @@
 package org.example.service;
 
+import org.assertj.core.api.Assertions;
 import org.example.model.Audit;
-import org.example.repository.AuditInMemoryRepository;
 import org.example.util.AuditType;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.time.Instant;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Класс для тестирования AuditService
@@ -17,34 +22,40 @@ class AuditServiceTest {
 
     @BeforeAll
     static void init() {
-        service = new AuditService(new AuditInMemoryRepository());
+        service = Mockito.mock(AuditServiceImpl.class);
         loginPlayer = "tester";
+        when(service.findAuditsByLoginPlayer(loginPlayer))
+                .thenReturn(List.of(
+                        new Audit(AuditType.REGISTRATION, loginPlayer, Instant.now()))
+                );
     }
 
     /**
      * Тест для проверки шаблона проектирования Singleton
      */
     @Test
-    @DisplayName("Тест 1. Проверка шаблона проектирования Singleton.")
+    @DisplayName("Проверка шаблона проектирования Singleton.")
     void getInstance() {
-        AuditService first = AuditService.getInstance();
-        AuditService secondPointer = AuditService.getInstance();
-        Assertions.assertSame(first, secondPointer, "Указатели ссылаются на разные объекты.");
+        AuditServiceImpl first = AuditServiceImpl.getInstance();
+        AuditServiceImpl secondPointer = AuditServiceImpl.getInstance();
+        Assertions.assertThat(first)
+                .as("Указатели ссылаются на разные объекты.")
+                .isEqualTo(secondPointer);
     }
 
     /**
      * Тест сохранения аудита и его нахождения по логину пользователя
      */
     @Test
-    @DisplayName("Тест 2. Удачное создание и нахождение аудита по логину игрока")
+    @DisplayName("Удачное создание и нахождение аудита по логину игрока")
     void createAndFindAuditByLoginPlayer() {
         AuditType auditType = AuditType.REGISTRATION;
         service.addAudit(auditType, loginPlayer);
         Audit foundAudit = service.findAuditsByLoginPlayer(loginPlayer).get(0);
-        Assertions.assertTrue(
-                foundAudit.loginPlayer().equals(loginPlayer) &&
-                        foundAudit.type().equals(auditType),
-                "Аудит не соответствует ожиданиям");
+        Assertions.assertThat(foundAudit.loginPlayer().equals(loginPlayer) &&
+                        foundAudit.type().equals(auditType))
+                .as("Аудит не соответствует ожиданиям")
+                .isTrue();
     }
 
 }

@@ -14,7 +14,6 @@ import org.example.util.BasicPhrases;
  * Класс, который ответственный за обработку поступающих запросов.
  */
 public class PlayerConsoleController {
-    private static PlayerConsoleController instance;
 
     private static final int EXIT_CODE = 0;
     private static final int REGISTRATION_CODE = 1;
@@ -40,24 +39,16 @@ public class PlayerConsoleController {
      */
     private Player playerNow = null;
 
-    private PlayerConsoleController() {
-        playerService = PlayerService.getInstance();
-        auditService = AuditService.getInstance();
-        transactionService = TransactionService.getInstance();
-        consoleReader = ConsoleReader.getInstance();
+    public PlayerConsoleController(PlayerService playerService,
+                                   AuditService auditService,
+                                   TransactionService transactionService,
+                                   ConsoleReader consoleReader) {
+        this.playerService = playerService;
+        this.auditService = auditService;
+        this.transactionService = transactionService;
+        this.consoleReader = consoleReader;
     }
 
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность PlayerConsoleController
-     */
-    public static PlayerConsoleController getInstance() {
-        if (instance == null) {
-            instance = new PlayerConsoleController();
-        }
-        return instance;
-    }
 
     /**
      * Метод запускающий цикл для обработки запросов пользователя.
@@ -90,7 +81,8 @@ public class PlayerConsoleController {
         int typeOperation = consoleReader.readTypeOperation();
         switch (typeOperation) {
             case EXIT_CODE -> isFinish = true;
-            case REGISTRATION_CODE, AUTHORIZATION_CODE -> registerOrAuthorizePlayer(typeOperation);
+            case REGISTRATION_CODE -> registerPlayer();
+            case AUTHORIZATION_CODE -> authenticatePlayer();
             default -> System.out.println(BasicPhrases.COMMAND_NOT_FOUND);
         }
     }
@@ -105,7 +97,8 @@ public class PlayerConsoleController {
         int typeOperation = consoleReader.readTypeOperation();
         switch (typeOperation) {
             case EXIT_CODE -> isFinish = true;
-            case REGISTRATION_CODE, AUTHORIZATION_CODE -> registerOrAuthorizePlayer(typeOperation);
+            case REGISTRATION_CODE -> registerPlayer();
+            case AUTHORIZATION_CODE -> authenticatePlayer();
             case BALANCE_CODE -> printBalancePlayer();
             case DEBIT_CODE -> debitForPlayer();
             case CREDIT_CODE -> creditForPlayer();
@@ -121,12 +114,11 @@ public class PlayerConsoleController {
     }
 
     /**
-     * Метод для авторизации или регистрации игрока.
+     * Метод для регистрации игрока.
      *
-     * @param typeOperation тип операции пользователя
-     * @throws Exception ошибка при попытке авторизации
+     * @throws Exception ошибка при попытке регистрации
      */
-    private void registerOrAuthorizePlayer(int typeOperation) throws Exception {
+    private void registerPlayer() throws Exception {
         String previousLoginPlayer = null;
         if (playerNow != null) {
             previousLoginPlayer = playerNow.getLogin();
@@ -134,17 +126,31 @@ public class PlayerConsoleController {
         System.out.println(BasicPhrases.REQUEST_LOGIN_AND_PASSWORD);
         String login = consoleReader.readStringInfo();
         String password = consoleReader.readStringInfo();
-        playerNow = (typeOperation == REGISTRATION_CODE) ?
-                playerService.registration(login, password) :
-                playerService.authorization(login, password);
+        playerNow = playerService.registration(login, password);
         if (previousLoginPlayer != null) {
             auditService.addAudit(AuditType.EXIT, previousLoginPlayer);
         }
-        if (typeOperation == REGISTRATION_CODE) {
-            auditService.addAudit(AuditType.REGISTRATION, playerNow.getLogin());
-        } else {
-            auditService.addAudit(AuditType.AUTHORIZATION, playerNow.getLogin());
+        auditService.addAudit(AuditType.REGISTRATION, playerNow.getLogin());
+    }
+
+    /**
+     * Метод для аутентификации игрока.
+     *
+     * @throws Exception ошибка при попытке аутентификации
+     */
+    private void authenticatePlayer() throws Exception {
+        String previousLoginPlayer = null;
+        if (playerNow != null) {
+            previousLoginPlayer = playerNow.getLogin();
         }
+        System.out.println(BasicPhrases.REQUEST_LOGIN_AND_PASSWORD);
+        String login = consoleReader.readStringInfo();
+        String password = consoleReader.readStringInfo();
+        playerNow = playerService.authorization(login, password);
+        if (previousLoginPlayer != null) {
+            auditService.addAudit(AuditType.EXIT, previousLoginPlayer);
+        }
+        auditService.addAudit(AuditType.AUTHORIZATION, playerNow.getLogin());
     }
 
     /**

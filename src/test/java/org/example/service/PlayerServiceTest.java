@@ -1,11 +1,17 @@
 package org.example.service;
 
+import org.assertj.core.api.Assertions;
 import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
 import org.example.model.Player;
 import org.example.repository.PlayerInMemoryRepository;
 import org.example.repository.TransactionInMemoryRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 /**
  * Класс для тестирования PlayerServiceTest
@@ -31,198 +37,198 @@ class PlayerServiceTest {
 
     @BeforeEach
     void setPlayerService() {
-        playerService = new PlayerService(
+        playerService = new PlayerServiceImpl(
                 new PlayerInMemoryRepository(),
-                new TransactionService(new TransactionInMemoryRepository()));
+                new TransactionServiceImpl(new TransactionInMemoryRepository()));
     }
 
     /**
      * Тест для проверки шаблона проектирования Singleton
      */
     @Test
-    @DisplayName("Тест 1. Проверка шаблона проектирования Singleton.")
+    @DisplayName("Проверка шаблона проектирования Singleton.")
     void getInstance() {
-        PlayerService firstPointer = PlayerService.getInstance();
-        PlayerService secondPointer = PlayerService.getInstance();
-        Assertions.assertSame(firstPointer, secondPointer, "Указатели ссылаются на разные объекты.");
+        PlayerServiceImpl firstPointer = PlayerServiceImpl.getInstance();
+        PlayerServiceImpl secondPointer = PlayerServiceImpl.getInstance();
+        Assertions.assertThat(firstPointer)
+                .as("Указатели ссылаются на разные объекты.")
+                .isEqualTo(secondPointer);
     }
 
     /**
      * Тест для проверки отработки исключения при передаче в метод регистрации пустое поле login
      */
     @Test
-    @DisplayName("Тест 2. Не удачная регистрации при пустом поле login.")
+    @DisplayName("Не удачная регистрации при пустом поле login.")
     void registrationPlayerWhenLoginIsBlank() {
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class, () ->
-                        playerService.registration(blank, passwordPlayer),
-                "Ожидаемое исключение не было отловлено");
-        Assertions.assertEquals(expectedErrorMessage, exception.getMessage(),
-                "Ожидаемое сообщение об ошибки не совпадает с полученным результатом");
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.registration(blank, passwordPlayer));
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage(expectedErrorMessage);
     }
 
     /**
      * Тест для проверки отработки исключения при передаче в метод регистрации пустое поле password
      */
     @Test
-    @DisplayName("Тест 3. Не удачная регистрации при пустом поле password.")
+    @DisplayName("Не удачная регистрации при пустом поле password.")
     void registrationPlayerWhenPasswordIsBlank() {
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class, () ->
-                        playerService.registration(loginPlayer, blank),
-                "Ожидаемое исключение не было отловлено");
-        Assertions.assertEquals(expectedErrorMessage, exception.getMessage(),
-                "Ожидаемое сообщение об ошибки не совпадает с полученным результатом");
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.registration(loginPlayer, blank));
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage(expectedErrorMessage);
     }
 
     /**
      * Тест для регистрации игрока
      */
     @Test
-    @DisplayName("Тест 4. Удачная регистрации игрока.")
+    @DisplayName("Удачная регистрации игрока.")
     void registrationPlayer() {
         Player registeredPlayer = playerService.registration(loginPlayer, passwordPlayer);
-        Assertions.assertEquals(expectedPlayer, registeredPlayer,
-                "Полученный игрок не совпадает с ожидаемым игроком");
+        Assertions.assertThat(expectedPlayer)
+                .as("Полученный игрок не совпадает с ожидаемым игроком.")
+                .isEqualTo(registeredPlayer);
     }
 
     /**
      * Тест для авторизации игрока
      */
     @Test
-    @DisplayName("Тест 5. Удачная авторизации игрока.")
+    @DisplayName("Удачная авторизации игрока.")
     void authorizationPlayer() {
         playerService.registration(loginPlayer, passwordPlayer);
         Player authorizedPlayer = playerService.authorization(loginPlayer, passwordPlayer);
-        Assertions.assertEquals(expectedPlayer, authorizedPlayer,
-                "Полученный игрок не совпадает с ожидаемым игроком");
+        Assertions.assertThat(expectedPlayer)
+                .as("Полученный игрок не совпадает с ожидаемым игроком.")
+                .isEqualTo(authorizedPlayer);
     }
 
     /**
      * Тест для авторизации игрока c неверным паролем
      */
     @Test
-    @DisplayName("Тест 6. Не удачная авторизации игрока c неверным паролем.")
+    @DisplayName("Не удачная авторизации игрока c неверным паролем.")
     void authorizationPlayerWithWrongPassword() {
         playerService.registration(loginPlayer, passwordPlayer);
         Player authorizedPlayer = playerService.authorization(loginPlayer, passwordPlayer + "123");
-        Assertions.assertNull(authorizedPlayer, "Полученный игрок должен быть пустым");
+        Assertions.assertThat(authorizedPlayer)
+                .as("Полученный игрок должен быть пустым.")
+                .isNull();
     }
 
     /**
      * Тест для авторизации игрока с пустым полем login
      */
     @Test
-    @DisplayName("Тест 7. Не удачная авторизации игрока с пустым полем login.")
+    @DisplayName("Не удачная авторизации игрока с пустым полем login.")
     void authorizationPlayerWithLoginIsBlank() {
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class, () ->
-                        playerService.registration(blank, passwordPlayer),
-                "Ожидаемое исключение не было отловлено");
-        Assertions.assertEquals(expectedErrorMessage, exception.getMessage(),
-                "Ожидаемое сообщение об ошибки не совпадает с полученным результатом");
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.authorization(blank, passwordPlayer));
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage(expectedErrorMessage);
     }
 
     /**
      * Тест для авторизации игрока с пустым полем password
      */
     @Test
-    @DisplayName("Тест 8. Не удачная авторизации игрока с пустым полем password.")
+    @DisplayName("Не удачная авторизации игрока с пустым полем password.")
     void authorizationPlayerWithPasswordIsBlank() {
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class, () ->
-                        playerService.registration(loginPlayer, blank),
-                "Ожидаемое исключение не было отловлено");
-        Assertions.assertEquals(expectedErrorMessage, exception.getMessage(),
-                "Ожидаемое сообщение об ошибки не совпадает с полученным результатом");
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.authorization(loginPlayer, blank));
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage(expectedErrorMessage);
     }
 
     /**
      * Тест для проверки пополнения счета
      */
     @Test
-    @DisplayName("Тест 9. Удачное пополнения счета игрока.")
+    @DisplayName("Удачное пополнения счета игрока.")
     void creditForPlayer() {
         Player registeredPlayer = playerService.registration(loginPlayer, passwordPlayer);
         double creditSize = 1200;
         playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
-        Assertions.assertEquals(creditSize, registeredPlayer.getBalance(),
-                "Полученный баланс у игрока не равен ожидаемому");
+        Assertions.assertThat(BigDecimal.valueOf(creditSize))
+                .as("Полученный баланс у игрока не равен ожидаемому.")
+                .isEqualTo(registeredPlayer.getBalance());
     }
 
-    /**
-     * Тест для проверки пополнения счета при переполнении
-     */
-    @Test
-    @DisplayName("Тест 10. Не удачное пополнения счета игрока из-за переполнения типа double.")
-    void creditForPlayerWhenOverflowing() {
-        playerService.registration(loginPlayer, passwordPlayer);
-        double creditSize = Double.MAX_VALUE;
-        playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
-
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class, () ->
-                        playerService.creditForPlayer(loginPlayer, transactionId + 1, creditSize),
-                "Ожидаемое исключение не было отловлено");
-
-        String expectedMessageErrorWhenOverflowing = "Уменьшите размер кредита";
-        Assertions.assertEquals(expectedMessageErrorWhenOverflowing, exception.getMessage(),
-                "Ожидаемое сообщение об ошибки не совпадает с полученным результатом");
-    }
 
     /**
      * Тест для проверки пополнения счета, когда игрока с login не существует
      */
     @Test
-    @DisplayName("Тест 11. Не удачное пополнения счета игрока не существующего игрока.")
+    @DisplayName("Не удачное пополнения счета игрока не существующего игрока.")
     void creditForPlayerWhenLoginIsWrong() {
         double creditSize = 1200;
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () ->
-                        playerService.creditForPlayer(loginPlayer, transactionId, creditSize),
-                "Ожидаемое исключение не было отловлено");
 
-        String expectedMessageErrorWhenOverflowing = "Игрок не найден.";
-        Assertions.assertEquals(expectedMessageErrorWhenOverflowing, exception.getMessage());
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.creditForPlayer(loginPlayer, transactionId, creditSize));
+        String expectedMessageErrorWhenLoginIsWrong = "Игрок не найден.";
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(expectedMessageErrorWhenLoginIsWrong);
     }
 
     /**
      * Тест для проверки снятия со счета
      */
     @Test
-    @DisplayName("Тест 12. Удачное снятия со счета игрока.")
+    @DisplayName("Удачное снятия со счета игрока.")
     void debitForPlayer() {
         Player registeredPlayer = playerService.registration(loginPlayer, passwordPlayer);
         double creditSize = 1200;
         double debitSize = creditSize - 200;
         playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
         playerService.debitForPlayer(loginPlayer, transactionId + 1, debitSize);
-        Assertions.assertEquals(creditSize - debitSize, registeredPlayer.getBalance(),
-                "Полученный баланс у игрока не равен ожидаемому");
+        Assertions.assertThat(BigDecimal.valueOf(creditSize - debitSize))
+                .as("Полученный баланс у игрока не равен ожидаемому.")
+                .isEqualTo(registeredPlayer.getBalance());
     }
 
     /**
      * Тест для проверки снятия со счета не существующего игрока
      */
     @Test
-    @DisplayName("Тест 13. Не удачное снятия со счета не существующего игрока.")
+    @DisplayName("Не удачное снятия со счета не существующего игрока.")
     void debitForPlayerWhenLoginIsWrong() {
         double debitSize = 1200;
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () ->
-                        playerService.debitForPlayer(loginPlayer, transactionId, debitSize),
-                "Ожидаемое исключение не было отловлено");
 
-        String expectedMessageErrorWhenOverflowing = "Игрок не найден.";
-        Assertions.assertEquals(expectedMessageErrorWhenOverflowing, exception.getMessage());
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.debitForPlayer(loginPlayer, transactionId, debitSize));
+        String expectedMessageErrorWhenLoginIsWrong = "Игрок не найден.";
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(expectedMessageErrorWhenLoginIsWrong);
     }
 
     /**
      * Тест для проверки снятия со счета при ма
      */
     @Test
-    @DisplayName("Тест 14. Не удачное снятия со счета игрока, когда размер дебета превышает размер баланса игрока.")
+    @DisplayName("Не удачное снятия со счета игрока, когда размер дебета превышает размер баланса игрока.")
     void debitForPlayerWhenDebitSizeLargerBalancePlayer() {
         playerService.registration(loginPlayer, passwordPlayer);
         double debitSize = 200;
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class, () ->
-                        playerService.debitForPlayer(loginPlayer, transactionId, debitSize),
-                "Ожидаемое исключение не было отловлено");
 
-        String expectedMessageErrorWhenOverflowing = "У вас нету столько средств на балансе.";
-        Assertions.assertEquals(expectedMessageErrorWhenOverflowing, exception.getMessage());
+        String expectedMessageErrorWhenDebitSizeLargerBalancePlayer = "У вас нету столько средств на балансе.";
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.debitForPlayer(loginPlayer, transactionId, debitSize));
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage(expectedMessageErrorWhenDebitSizeLargerBalancePlayer);
     }
 }

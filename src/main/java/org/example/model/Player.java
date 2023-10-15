@@ -1,20 +1,30 @@
 package org.example.model;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Сущность Player.
  */
 public class Player {
+    /**
+     * Логин игрока.
+     */
     private final String login;
+    /**
+     * Пароль игрока.
+     */
     private final String password;
-    private Double balance;
+    /**
+     * Количество средств игрока.
+     */
+    private BigDecimal balance;
 
 
     public Player(String login, String password) {
         this.login = login;
         this.password = password;
-        this.balance = 0.0;
+        this.balance = new BigDecimal(0);
     }
 
 
@@ -26,11 +36,11 @@ public class Player {
         return password;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

@@ -5,12 +5,12 @@ import org.example.model.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Класс для хранения сущности Player в памяти компьютера.
  */
-public class PlayerInMemoryRepository {
-    private static PlayerInMemoryRepository instance;
+public class PlayerInMemoryRepository implements PlayerRepository {
 
     /**
      * Коллекция для хранения игроков login игрока - сущность игрока.
@@ -22,15 +22,7 @@ public class PlayerInMemoryRepository {
         players = new HashMap<>();
     }
 
-
-    /**
-     * Метод для сохранения сущности в память.
-     *
-     * @param loginPlayer логин игрока
-     * @param password    пароль игрока
-     * @return созданный игрок
-     * @throws SaveEntityException если переданный логин уже существует
-     */
+    @Override
     public Player save(String loginPlayer, String password) throws SaveEntityException {
         if (players.containsKey(loginPlayer)) {
             throw new SaveEntityException("Игрок с таким логином существует!");
@@ -40,13 +32,8 @@ public class PlayerInMemoryRepository {
         return newPlayer;
     }
 
-    /**
-     * Нахождения игрока по его логину.
-     *
-     * @param loginPlayer логин игрока
-     * @return найденный игрок или null, если игрок не найден.
-     */
-    public Player findByLogin(String loginPlayer) {
-        return players.getOrDefault(loginPlayer, null);
+    @Override
+    public Optional<Player> findByLogin(String loginPlayer) {
+        return Optional.ofNullable(players.getOrDefault(loginPlayer, null));
     }
 }

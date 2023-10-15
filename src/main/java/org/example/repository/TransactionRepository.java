@@ -1,4 +1,4 @@
-package org.example.service;
+package org.example.repository;
 
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
@@ -7,9 +7,9 @@ import org.example.util.TransactionType;
 import java.util.List;
 
 /**
- * Интерфейс описывающий API бизнес-логики для сущности Transaction
+ * Интерфейс описывающий API для действий с сущностью Transaction
  */
-public interface TransactionService {
+public interface TransactionRepository {
     /**
      * Метод для создания транзакции.
      *
@@ -19,24 +19,24 @@ public interface TransactionService {
      * @param loginPlayer     логин игрока
      * @throws SaveEntityException ошибка при попытке создания транзакции
      */
-    void createTransaction(Long transactionId,
-                           TransactionType transactionType,
-                           Double size,
-                           String loginPlayer) throws SaveEntityException;
+    void createdTransaction(Long transactionId,
+                            TransactionType transactionType,
+                            Double size,
+                            String loginPlayer) throws SaveEntityException;
 
     /**
-     * Метод запрашивает все транзакций типа CREDIT по логину игрока и отсортированный по времени у репозитория.
+     * Метод для нахождения всех транзакций типа CREDIT по логину игрока и отсортированный по времени.
      *
      * @param loginPlayer логин игрока
      * @return список всех транзакций типа CREDIT по логину игрока и отсортированный по времени
      */
-    List<Transaction> getCreditHistoryTransactions(String loginPlayer);
+    List<Transaction> findCreditHistoryTransactionsByCreatedTime(String loginPlayer);
 
     /**
-     * Метод запрашивает все транзакций типа DEBIT по логину игрока и отсортированный по времени у репозитория.
+     * Метод для нахождения всех транзакций типа DEBIT по логину игрока и отсортированный по времени.
      *
      * @param loginPlayer логин игрока
      * @return список всех транзакций типа DEBIT по логину игрока и отсортированный по времени
      */
-    List<Transaction> getDebitHistoryTransactions(String loginPlayer);
+    List<Transaction> findDebitHistoryTransactionsByCreatedTime(String loginPlayer);
 }
