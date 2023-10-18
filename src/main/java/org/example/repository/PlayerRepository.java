@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface PlayerRepository {
 
     /**
-     * Метод для сохранения сущности в память.
+     * Метод для сохранения сущности.
      *
      * @param loginPlayer логин игрока
      * @param password    пароль игрока
@@ -27,4 +27,12 @@ public interface PlayerRepository {
      * @return найденный игрок или null, если игрок не найден.
      */
     Optional<Player> findByLogin(String loginPlayer);
+
+    /**
+     * Метод для обновления игрока в таблице БД
+     *
+     * @param loginPlayer логин игрока
+     */
+    void updateBalanceByLogin(String loginPlayer, double newBalance);
+
 }

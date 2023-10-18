@@ -11,5 +11,5 @@ import java.time.Instant;
  * @param loginPlayer логин игрока, который был инициатором создания аудита
  * @param createdTime дата создания
  */
-public record Audit(AuditType type, String loginPlayer, Instant createdTime) {
+public record Audit(Long id, AuditType type, String loginPlayer, Instant createdTime) {
 }

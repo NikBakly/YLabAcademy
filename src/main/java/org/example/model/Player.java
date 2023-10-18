@@ -8,6 +8,10 @@ import java.util.Objects;
  */
 public class Player {
     /**
+     * Идентификатор игрока
+     */
+    private final Long id;
+    /**
      * Логин игрока.
      */
     private final String login;
@@ -20,13 +24,17 @@ public class Player {
      */
     private BigDecimal balance;
 
-
-    public Player(String login, String password) {
+    public Player(Long id, String login, String password, Double balance) {
+        this.id = id;
         this.login = login;
         this.password = password;
-        this.balance = new BigDecimal(0);
+        this.balance = BigDecimal.valueOf(balance);
     }
 
+
+    public Long getId() {
+        return id;
+    }
 
     public String getLogin() {
         return login;
