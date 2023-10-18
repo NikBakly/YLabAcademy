@@ -9,6 +9,7 @@ import org.example.service.PlayerService;
 import org.example.service.TransactionService;
 import org.example.util.AuditType;
 import org.example.util.BasicPhrases;
+import org.example.util.TransactionType;
 
 /**
  * Класс, который ответственный за обработку поступающих запросов.
@@ -96,15 +97,18 @@ public class PlayerConsoleController {
         System.out.println(BasicPhrases.FOR_AUTHORIZED);
         int typeOperation = consoleReader.readTypeOperation();
         switch (typeOperation) {
-            case EXIT_CODE -> isFinish = true;
+            case EXIT_CODE -> {
+                auditService.addAudit(AuditType.EXIT, playerNow.getLogin());
+                isFinish = true;
+            }
             case REGISTRATION_CODE -> registerPlayer();
             case AUTHORIZATION_CODE -> authenticatePlayer();
             case BALANCE_CODE -> printBalancePlayer();
             case DEBIT_CODE -> debitForPlayer();
             case CREDIT_CODE -> creditForPlayer();
             case CREDIT_HISTORY_CODE -> printCreditHistory();
-            case AUDIT_CODE -> printAudit();
             case DEBIT_HISTORY_CODE -> printDebitHistory();
+            case AUDIT_CODE -> printAudit();
             default -> {
                 auditService.addAudit(AuditType.ERROR_ENTERING_COMMAND, playerNow.getLogin());
                 System.out.println(BasicPhrases.COMMAND_NOT_FOUND);
@@ -171,7 +175,7 @@ public class PlayerConsoleController {
         long transactionId = consoleReader.readTransactionId();
         System.out.println(BasicPhrases.ASK_FOR_DEBIT_SIZE);
         double debitSize = consoleReader.readDoubleNumber();
-        playerService.debitForPlayer(playerNow.getLogin(), transactionId, debitSize);
+        playerNow = playerService.debitForPlayer(playerNow.getLogin(), transactionId, debitSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
         auditService.addAudit(AuditType.DEBIT, playerNow.getLogin());
     }
@@ -186,7 +190,7 @@ public class PlayerConsoleController {
         long transactionId = consoleReader.readTransactionId();
         System.out.println(BasicPhrases.ASK_FOR_CREDIT_SIZE);
         double creditSize = consoleReader.readDoubleNumber();
-        playerService.creditForPlayer(playerNow.getLogin(), transactionId, creditSize);
+        playerNow = playerService.creditForPlayer(playerNow.getLogin(), transactionId, creditSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
         auditService.addAudit(AuditType.CREDIT, playerNow.getLogin());
     }
@@ -195,7 +199,7 @@ public class PlayerConsoleController {
      * Метод выводит в консоль историю пополнений.
      */
     private void printCreditHistory() {
-        System.out.println(transactionService.getCreditHistoryTransactions(playerNow.getLogin()));
+        System.out.println(transactionService.getHistoryTransactions(playerNow.getLogin(), TransactionType.CREDIT));
         auditService.addAudit(AuditType.REQUEST_CREDIT_HISTORY, playerNow.getLogin());
 
     }
@@ -204,7 +208,7 @@ public class PlayerConsoleController {
      * Метод выводит в консоль историю снятия.
      */
     private void printDebitHistory() {
-        System.out.println(transactionService.getDebitHistoryTransactions(playerNow.getLogin()));
+        System.out.println(transactionService.getHistoryTransactions(playerNow.getLogin(), TransactionType.DEBIT));
         auditService.addAudit(AuditType.REQUEST_DEBIT_HISTORY, playerNow.getLogin());
     }
 
