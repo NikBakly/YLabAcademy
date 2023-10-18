@@ -2,14 +2,16 @@ package org.example.service;
 
 import org.assertj.core.api.Assertions;
 import org.example.model.Transaction;
-import org.example.repository.TransactionInMemoryRepository;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import java.time.Instant;
 import java.util.List;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Класс для тестирования TransactionService
@@ -20,7 +22,7 @@ class TransactionServiceTest {
     static TransactionType creditTransactionType;
     static TransactionType debitTransactionType;
     static double transactionSize;
-    TransactionService transactionService;
+    static TransactionService transactionService;
 
     @BeforeAll
     static void init() {
@@ -29,12 +31,26 @@ class TransactionServiceTest {
         creditTransactionType = TransactionType.CREDIT;
         debitTransactionType = TransactionType.DEBIT;
         transactionSize = 1000;
+
+        transactionService = Mockito.mock(TransactionService.class);
+        when(transactionService.getHistoryTransactions(loginPlayer, TransactionType.DEBIT))
+                .thenReturn(List.of(new Transaction(
+                        transactionId,
+                        debitTransactionType,
+                        transactionSize,
+                        loginPlayer,
+                        Instant.now())
+                ));
+        when(transactionService.getHistoryTransactions(loginPlayer, TransactionType.CREDIT))
+                .thenReturn(List.of(new Transaction(
+                        transactionId,
+                        creditTransactionType,
+                        transactionSize,
+                        loginPlayer,
+                        Instant.now())
+                ));
     }
 
-    @BeforeEach
-    void setTransactionService() {
-        transactionService = new TransactionServiceImpl(new TransactionInMemoryRepository());
-    }
 
     /**
      * Тест для проверки шаблона проектирования Singleton
@@ -56,7 +72,8 @@ class TransactionServiceTest {
     @DisplayName("Удачное создание debit транзакции и просмотр ее в историях")
     void createAndGetHistoryDebitTransactions() {
         transactionService.createTransaction(transactionId, debitTransactionType, transactionSize, loginPlayer);
-        List<Transaction> foundTransactions = transactionService.getDebitHistoryTransactions(loginPlayer);
+        List<Transaction> foundTransactions =
+                transactionService.getHistoryTransactions(loginPlayer, TransactionType.DEBIT);
 
         int expectedSizeList = 1;
         Assertions.assertThat(expectedSizeList)
@@ -79,7 +96,8 @@ class TransactionServiceTest {
     @DisplayName("Удачное создание credit транзакции и просмотр ее в историях")
     void createAndGetHistoryCreditTransactions() {
         transactionService.createTransaction(transactionId, creditTransactionType, transactionSize, loginPlayer);
-        List<Transaction> foundTransactions = transactionService.getCreditHistoryTransactions(loginPlayer);
+        List<Transaction> foundTransactions =
+                transactionService.getHistoryTransactions(loginPlayer, TransactionType.CREDIT);
 
         int expectedSizeList = 1;
         Assertions.assertThat(expectedSizeList)

@@ -22,11 +22,11 @@ class AuditServiceTest {
 
     @BeforeAll
     static void init() {
-        service = Mockito.mock(AuditServiceImpl.class);
+        service = Mockito.mock(AuditService.class);
         loginPlayer = "tester";
         when(service.findAuditsByLoginPlayer(loginPlayer))
                 .thenReturn(List.of(
-                        new Audit(AuditType.REGISTRATION, loginPlayer, Instant.now()))
+                        new Audit(1L, AuditType.REGISTRATION, loginPlayer, Instant.now()))
                 );
     }
 

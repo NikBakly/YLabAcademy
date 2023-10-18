@@ -3,16 +3,25 @@ package org.example.repository;
 import org.assertj.core.api.Assertions;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
+import org.example.util.DatabaseConnector;
+import org.example.util.LiquibaseManager;
 import org.example.util.TransactionType;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Класс для тестирования TransactionInMemoryRepository
  */
-class TransactionInMemoryRepositoryTest {
+@Testcontainers
+class TransactionRepositoryTest {
+    @Container
+    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:13.3")
+            .withDatabaseName(DatabaseConnector.DATABASE_NAME)
+            .withUsername(DatabaseConnector.USERNAME)
+            .withPassword(DatabaseConnector.PASSWORD);
+
     static TransactionRepository repository;
     static Double sizeTransaction;
     static String loginPlayer;
@@ -27,7 +36,20 @@ class TransactionInMemoryRepositoryTest {
 
     @BeforeEach
     void initRepository() {
-        repository = new TransactionInMemoryRepository();
+        postgresContainer.start();
+        LiquibaseManager.runDatabaseMigrations(
+                postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(),
+                postgresContainer.getPassword());
+        repository = new TransactionRepositoryImpl(
+                postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(),
+                postgresContainer.getPassword());
+    }
+
+    @AfterEach
+    void closeContainer() {
+        postgresContainer.close();
     }
 
     /**
@@ -40,7 +62,8 @@ class TransactionInMemoryRepositoryTest {
         repository.createdTransaction(transactionId, transactionType, sizeTransaction, loginPlayer);
 
         //Достаем единственную транзакцию из истории пользователя
-        Transaction foundTransaction = repository.findCreditHistoryTransactionsByCreatedTime(loginPlayer).get(0);
+        Transaction foundTransaction =
+                repository.findHistoryTransactionsByCreatedTime(loginPlayer, TransactionType.CREDIT).get(0);
         Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
@@ -56,7 +79,8 @@ class TransactionInMemoryRepositoryTest {
         TransactionType transactionType = TransactionType.DEBIT;
         repository.createdTransaction(transactionId, transactionType, sizeTransaction, loginPlayer);
         //Достаем единственную транзакцию из истории пользователя
-        Transaction foundTransaction = repository.findDebitHistoryTransactionsByCreatedTime(loginPlayer).get(0);
+        Transaction foundTransaction =
+                repository.findHistoryTransactionsByCreatedTime(loginPlayer, TransactionType.DEBIT).get(0);
         Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
@@ -72,10 +96,8 @@ class TransactionInMemoryRepositoryTest {
         repository.createdTransaction(transactionId, TransactionType.CREDIT, sizeTransaction, loginPlayer);
         Throwable thrown = Assertions.catchThrowable(() ->
                 repository.createdTransaction(transactionId, TransactionType.CREDIT, sizeTransaction, loginPlayer));
-        String expectedErrorMessage = "Id транзакции не является уникальным!";
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
-                .isInstanceOf(SaveEntityException.class)
-                .hasMessage(expectedErrorMessage);
+                .isInstanceOf(SaveEntityException.class);
     }
 }

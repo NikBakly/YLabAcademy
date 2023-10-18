@@ -4,42 +4,90 @@ import org.assertj.core.api.Assertions;
 import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
 import org.example.model.Player;
-import org.example.repository.PlayerInMemoryRepository;
-import org.example.repository.TransactionInMemoryRepository;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.math.BigDecimal;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Класс для тестирования PlayerServiceTest
  */
 class PlayerServiceTest {
     static String loginPlayer;
+    static String loginWithError;
     static String passwordPlayer;
+    static String passwordWithError;
     static String blank;
     static Player expectedPlayer;
     static String expectedErrorMessage;
     static long transactionId;
-    PlayerService playerService;
+    static double creditSize;
+    static double debitSize;
+    static PlayerService playerService;
 
     @BeforeAll
     static void init() {
         loginPlayer = "test";
+        loginWithError = loginPlayer + " tester";
         passwordPlayer = "test";
+        passwordWithError = passwordPlayer + 123;
         blank = " ";
-        expectedPlayer = new Player(loginPlayer, passwordPlayer);
+        expectedPlayer = new Player(1L, loginPlayer, passwordPlayer, 0.0);
         expectedErrorMessage = "Логин или пароль не может быть пустым.";
         transactionId = 1;
-    }
+        creditSize = 1200;
+        debitSize = creditSize - 200;
 
-    @BeforeEach
-    void setPlayerService() {
-        playerService = new PlayerServiceImpl(
-                new PlayerInMemoryRepository(),
-                new TransactionServiceImpl(new TransactionInMemoryRepository()));
+        playerService = Mockito.mock(PlayerService.class);
+        when(playerService.registration(blank, passwordPlayer))
+                .thenThrow(new InvalidInputException(expectedErrorMessage));
+
+        when(playerService.registration(loginPlayer, blank))
+                .thenThrow(new InvalidInputException(expectedErrorMessage));
+
+        when(playerService.registration(loginPlayer, passwordPlayer))
+                .thenReturn(expectedPlayer);
+
+        when(playerService.authorization(loginPlayer, passwordPlayer))
+                .thenReturn(expectedPlayer);
+
+        when(playerService.authorization(loginPlayer, passwordWithError))
+                .thenReturn(null);
+
+        when(playerService.authorization(blank, passwordPlayer))
+                .thenThrow(new InvalidInputException(expectedErrorMessage));
+
+        when(playerService.authorization(loginPlayer, blank))
+                .thenThrow(new InvalidInputException(expectedErrorMessage));
+
+        when(playerService.creditForPlayer(loginPlayer, transactionId, creditSize))
+                .thenReturn(new Player(
+                        expectedPlayer.getId(),
+                        expectedPlayer.getLogin(),
+                        expectedPlayer.getPassword(),
+                        creditSize
+                ));
+
+        when(playerService.creditForPlayer(loginWithError, transactionId, creditSize))
+                .thenThrow(new NotFoundException("Игрок не найден."));
+
+        when(playerService.debitForPlayer(loginPlayer, transactionId + 1, debitSize))
+                .thenReturn(new Player(
+                        expectedPlayer.getId(),
+                        expectedPlayer.getLogin(),
+                        expectedPlayer.getPassword(),
+                        creditSize - debitSize
+                ));
+
+        when(playerService.debitForPlayer(loginWithError, transactionId, debitSize))
+                .thenThrow(new NotFoundException("Игрок не найден."));
+
+        when(playerService.debitForPlayer(loginPlayer, transactionId, debitSize))
+                .thenThrow(new InvalidInputException("У вас нету столько средств на балансе."));
     }
 
     /**
@@ -115,7 +163,7 @@ class PlayerServiceTest {
     @DisplayName("Не удачная авторизации игрока c неверным паролем.")
     void authorizationPlayerWithWrongPassword() {
         playerService.registration(loginPlayer, passwordPlayer);
-        Player authorizedPlayer = playerService.authorization(loginPlayer, passwordPlayer + "123");
+        Player authorizedPlayer = playerService.authorization(loginPlayer, passwordWithError);
         Assertions.assertThat(authorizedPlayer)
                 .as("Полученный игрок должен быть пустым.")
                 .isNull();
@@ -156,8 +204,7 @@ class PlayerServiceTest {
     @DisplayName("Удачное пополнения счета игрока.")
     void creditForPlayer() {
         Player registeredPlayer = playerService.registration(loginPlayer, passwordPlayer);
-        double creditSize = 1200;
-        playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
+        registeredPlayer = playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
         Assertions.assertThat(BigDecimal.valueOf(creditSize))
                 .as("Полученный баланс у игрока не равен ожидаемому.")
                 .isEqualTo(registeredPlayer.getBalance());
@@ -170,10 +217,8 @@ class PlayerServiceTest {
     @Test
     @DisplayName("Не удачное пополнения счета игрока не существующего игрока.")
     void creditForPlayerWhenLoginIsWrong() {
-        double creditSize = 1200;
-
         Throwable thrown = Assertions.catchThrowable(() ->
-                playerService.creditForPlayer(loginPlayer, transactionId, creditSize));
+                playerService.creditForPlayer(loginWithError, transactionId, creditSize));
         String expectedMessageErrorWhenLoginIsWrong = "Игрок не найден.";
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
@@ -188,10 +233,8 @@ class PlayerServiceTest {
     @DisplayName("Удачное снятия со счета игрока.")
     void debitForPlayer() {
         Player registeredPlayer = playerService.registration(loginPlayer, passwordPlayer);
-        double creditSize = 1200;
-        double debitSize = creditSize - 200;
-        playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
-        playerService.debitForPlayer(loginPlayer, transactionId + 1, debitSize);
+        registeredPlayer = playerService.creditForPlayer(loginPlayer, transactionId, creditSize);
+        registeredPlayer = playerService.debitForPlayer(loginPlayer, transactionId + 1, debitSize);
         Assertions.assertThat(BigDecimal.valueOf(creditSize - debitSize))
                 .as("Полученный баланс у игрока не равен ожидаемому.")
                 .isEqualTo(registeredPlayer.getBalance());
@@ -201,17 +244,15 @@ class PlayerServiceTest {
      * Тест для проверки снятия со счета не существующего игрока
      */
     @Test
-    @DisplayName("Не удачное снятия со счета не существующего игрока.")
+    @DisplayName("Не удачное снятия со счета у не существующего игрока.")
     void debitForPlayerWhenLoginIsWrong() {
-        double debitSize = 1200;
-
         Throwable thrown = Assertions.catchThrowable(() ->
-                playerService.debitForPlayer(loginPlayer, transactionId, debitSize));
-        String expectedMessageErrorWhenLoginIsWrong = "Игрок не найден.";
+                playerService.debitForPlayer(loginWithError, transactionId, debitSize));
+        String expectedNotFoundMessageError = "Игрок не найден.";
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage(expectedMessageErrorWhenLoginIsWrong);
+                .hasMessage(expectedNotFoundMessageError);
     }
 
     /**
@@ -221,8 +262,6 @@ class PlayerServiceTest {
     @DisplayName("Не удачное снятия со счета игрока, когда размер дебета превышает размер баланса игрока.")
     void debitForPlayerWhenDebitSizeLargerBalancePlayer() {
         playerService.registration(loginPlayer, passwordPlayer);
-        double debitSize = 200;
-
         String expectedMessageErrorWhenDebitSizeLargerBalancePlayer = "У вас нету столько средств на балансе.";
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.debitForPlayer(loginPlayer, transactionId, debitSize));

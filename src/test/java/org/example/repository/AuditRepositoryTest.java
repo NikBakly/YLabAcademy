@@ -3,21 +3,48 @@ package org.example.repository;
 import org.assertj.core.api.Assertions;
 import org.example.model.Audit;
 import org.example.util.AuditType;
+import org.example.util.DatabaseConnector;
+import org.example.util.LiquibaseManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
 /**
  * Класс для тестирования AuditInMemoryRepository
  */
-class AuditInMemoryRepositoryTest {
+@Testcontainers
+class AuditRepositoryTest {
+    @Container
+    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:13.3")
+            .withDatabaseName(DatabaseConnector.DATABASE_NAME)
+            .withUsername(DatabaseConnector.USERNAME)
+            .withPassword(DatabaseConnector.PASSWORD);
+
     AuditRepository repository;
 
     @BeforeEach
     void init() {
-        repository = new AuditInMemoryRepository();
+        postgresContainer.start();
+        LiquibaseManager.runDatabaseMigrations(
+                postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(),
+                postgresContainer.getPassword());
+        repository = new AuditRepositoryImpl(
+                postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(),
+                postgresContainer.getPassword()
+        );
+    }
+
+    @AfterEach
+    void closeContainer() {
+        postgresContainer.close();
     }
 
     /**
