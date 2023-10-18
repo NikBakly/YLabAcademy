@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.assertj.core.api.Assertions;
 import org.example.model.Audit;
+import org.example.repository.AuditRepository;
 import org.example.util.AuditType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -22,9 +23,11 @@ class AuditServiceTest {
 
     @BeforeAll
     static void init() {
-        service = Mockito.mock(AuditService.class);
+        AuditRepository auditRepository = Mockito.mock(AuditRepository.class);
+
+        service = new AuditServiceImpl(auditRepository);
         loginPlayer = "tester";
-        when(service.findAuditsByLoginPlayer(loginPlayer))
+        when(auditRepository.findAuditsByLoginPlayerByCreatedTime(loginPlayer))
                 .thenReturn(List.of(
                         new Audit(1L, AuditType.REGISTRATION, loginPlayer, Instant.now()))
                 );

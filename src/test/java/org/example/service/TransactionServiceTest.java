@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.assertj.core.api.Assertions;
 import org.example.model.Transaction;
+import org.example.repository.TransactionRepository;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +33,10 @@ class TransactionServiceTest {
         debitTransactionType = TransactionType.DEBIT;
         transactionSize = 1000;
 
-        transactionService = Mockito.mock(TransactionService.class);
-        when(transactionService.getHistoryTransactions(loginPlayer, TransactionType.DEBIT))
+        TransactionRepository transactionRepository = Mockito.mock(TransactionRepository.class);
+        transactionService = new TransactionServiceImpl(transactionRepository);
+
+        when(transactionRepository.findHistoryTransactionsByCreatedTime(loginPlayer, TransactionType.DEBIT))
                 .thenReturn(List.of(new Transaction(
                         transactionId,
                         debitTransactionType,
@@ -41,7 +44,7 @@ class TransactionServiceTest {
                         loginPlayer,
                         Instant.now())
                 ));
-        when(transactionService.getHistoryTransactions(loginPlayer, TransactionType.CREDIT))
+        when(transactionRepository.findHistoryTransactionsByCreatedTime(loginPlayer, TransactionType.CREDIT))
                 .thenReturn(List.of(new Transaction(
                         transactionId,
                         creditTransactionType,

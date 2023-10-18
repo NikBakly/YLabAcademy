@@ -4,12 +4,15 @@ import org.assertj.core.api.Assertions;
 import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
 import org.example.model.Player;
+import org.example.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
@@ -22,12 +25,32 @@ class PlayerServiceTest {
     static String passwordPlayer;
     static String passwordWithError;
     static String blank;
-    static Player expectedPlayer;
     static String expectedErrorMessage;
     static long transactionId;
     static double creditSize;
     static double debitSize;
-    static PlayerService playerService;
+    Player expectedPlayer;
+    PlayerService playerService;
+
+    @BeforeEach
+    void setPlayerService() {
+        expectedPlayer = new Player(1L, loginPlayer, passwordPlayer, 0.0);
+
+        PlayerRepository playerRepository = Mockito.mock(PlayerRepository.class);
+        TransactionService transactionService = Mockito.mock(TransactionService.class);
+
+        playerService = new PlayerServiceImpl(playerRepository, transactionService);
+
+        when(playerRepository.save(loginPlayer, passwordPlayer))
+                .thenReturn(expectedPlayer);
+
+        when(playerRepository.findByLogin(loginPlayer))
+                .thenReturn(Optional.ofNullable(expectedPlayer));
+
+        when(playerRepository.findByLogin(loginWithError))
+                .thenReturn(Optional.empty());
+    }
+
 
     @BeforeAll
     static void init() {
@@ -36,58 +59,10 @@ class PlayerServiceTest {
         passwordPlayer = "test";
         passwordWithError = passwordPlayer + 123;
         blank = " ";
-        expectedPlayer = new Player(1L, loginPlayer, passwordPlayer, 0.0);
         expectedErrorMessage = "Логин или пароль не может быть пустым.";
         transactionId = 1;
         creditSize = 1200;
         debitSize = creditSize - 200;
-
-        playerService = Mockito.mock(PlayerService.class);
-        when(playerService.registration(blank, passwordPlayer))
-                .thenThrow(new InvalidInputException(expectedErrorMessage));
-
-        when(playerService.registration(loginPlayer, blank))
-                .thenThrow(new InvalidInputException(expectedErrorMessage));
-
-        when(playerService.registration(loginPlayer, passwordPlayer))
-                .thenReturn(expectedPlayer);
-
-        when(playerService.authorization(loginPlayer, passwordPlayer))
-                .thenReturn(expectedPlayer);
-
-        when(playerService.authorization(loginPlayer, passwordWithError))
-                .thenReturn(null);
-
-        when(playerService.authorization(blank, passwordPlayer))
-                .thenThrow(new InvalidInputException(expectedErrorMessage));
-
-        when(playerService.authorization(loginPlayer, blank))
-                .thenThrow(new InvalidInputException(expectedErrorMessage));
-
-        when(playerService.creditForPlayer(loginPlayer, transactionId, creditSize))
-                .thenReturn(new Player(
-                        expectedPlayer.getId(),
-                        expectedPlayer.getLogin(),
-                        expectedPlayer.getPassword(),
-                        creditSize
-                ));
-
-        when(playerService.creditForPlayer(loginWithError, transactionId, creditSize))
-                .thenThrow(new NotFoundException("Игрок не найден."));
-
-        when(playerService.debitForPlayer(loginPlayer, transactionId + 1, debitSize))
-                .thenReturn(new Player(
-                        expectedPlayer.getId(),
-                        expectedPlayer.getLogin(),
-                        expectedPlayer.getPassword(),
-                        creditSize - debitSize
-                ));
-
-        when(playerService.debitForPlayer(loginWithError, transactionId, debitSize))
-                .thenThrow(new NotFoundException("Игрок не найден."));
-
-        when(playerService.debitForPlayer(loginPlayer, transactionId, debitSize))
-                .thenThrow(new InvalidInputException("У вас нету столько средств на балансе."));
     }
 
     /**

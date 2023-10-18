@@ -26,7 +26,7 @@ public class PlayerServiceImpl implements PlayerService {
         this.transactionService = TransactionServiceImpl.getInstance();
     }
 
-    public PlayerServiceImpl(PlayerRepository playerRepository, TransactionServiceImpl transactionService) {
+    public PlayerServiceImpl(PlayerRepository playerRepository, TransactionService transactionService) {
         this.playerRepository = playerRepository;
         this.transactionService = transactionService;
     }
