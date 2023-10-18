@@ -37,7 +37,7 @@ public interface PlayerService {
      * @param debitSize     размер средств для списания.
      * @throws RuntimeException ошибка при не выполненной операции.
      */
-    void debitForPlayer(String loginPlayer, long transactionId, double debitSize) throws RuntimeException;
+    Player debitForPlayer(String loginPlayer, long transactionId, double debitSize) throws RuntimeException;
 
     /**
      * Метод для выполнения кредит(пополнения средств) операции по логину игрока.
@@ -47,6 +47,6 @@ public interface PlayerService {
      * @param creditSize    размер средств для пополнения.
      * @throws RuntimeException ошибка при не выполненной операции.
      */
-    void creditForPlayer(String loginPlayer, long transactionId, double creditSize) throws RuntimeException;
+    Player creditForPlayer(String loginPlayer, long transactionId, double creditSize) throws RuntimeException;
 
 }

@@ -25,18 +25,11 @@ public interface TransactionService {
                            String loginPlayer) throws SaveEntityException;
 
     /**
-     * Метод запрашивает все транзакций типа CREDIT по логину игрока и отсортированный по времени у репозитория.
+     * Метод запрашивает все транзакций определенного типа по логину игрока и отсортированный по времени создания.
      *
      * @param loginPlayer логин игрока
-     * @return список всех транзакций типа CREDIT по логину игрока и отсортированный по времени
+     * @return список всех транзакций определенного типа по логину игрока и отсортированный по времени
      */
-    List<Transaction> getCreditHistoryTransactions(String loginPlayer);
+    List<Transaction> getHistoryTransactions(String loginPlayer, TransactionType transactionType);
 
-    /**
-     * Метод запрашивает все транзакций типа DEBIT по логину игрока и отсортированный по времени у репозитория.
-     *
-     * @param loginPlayer логин игрока
-     * @return список всех транзакций типа DEBIT по логину игрока и отсортированный по времени
-     */
-    List<Transaction> getDebitHistoryTransactions(String loginPlayer);
 }
