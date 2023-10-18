@@ -1,0 +1,18 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="insert-data" author="nikBakly">
+        <insert tableName="players" schemaName="wallet">
+            <column name="login" value="admin1"/>
+            <column name="password" value="pass1"/>
+            <column name="balance" value="1200"/>
+        </insert>
+        <insert tableName="players" schemaName="wallet">
+            <column name="login" value="admin2"/>
+            <column name="password" value="pass2"/>
+            <column name="balance" value="590"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="create-table" author="nikBakly">
+        <createTable tableName="players" schemaName="wallet">
+            <column name="id" type="BIGINT" defaultValueComputed="nextval('wallet_sequence')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="NUMERIC(11, 3)" defaultValue="0"/>
+        </createTable>
+
+        <createTable tableName="audits" schemaName="wallet">
+            <column name="id" type="BIGINT" defaultValueComputed="nextval('wallet_sequence')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_player" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="transactions" schemaName="wallet">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_player" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

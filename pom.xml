@@ -23,6 +23,8 @@
         <exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
         <postgresql.version>42.6.0</postgresql.version>
         <liquibase-core.version>4.24.0</liquibase-core.version>
+        <testcontainers.postgresql.version>1.18.3</testcontainers.postgresql.version>
+        <testcontainers.junit-jupiter.version>1.19.1</testcontainers.junit-jupiter.version>
     </properties>
 
     <dependencies>
@@ -60,6 +62,19 @@
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase-core.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.postgresql.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
 
     </dependencies>
