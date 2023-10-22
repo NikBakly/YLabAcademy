@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.assertj.core.api.Assertions;
 import org.example.model.Audit;
+import org.example.repository.AuditRepository;
 import org.example.util.AuditType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -18,15 +19,17 @@ import static org.mockito.Mockito.when;
  */
 class AuditServiceTest {
     static AuditService service;
-    static String loginPlayer;
+    static Long playerId;
 
     @BeforeAll
     static void init() {
-        service = Mockito.mock(AuditServiceImpl.class);
-        loginPlayer = "tester";
-        when(service.findAuditsByLoginPlayer(loginPlayer))
+        AuditRepository auditRepository = Mockito.mock(AuditRepository.class);
+
+        service = new AuditServiceImpl(auditRepository);
+        playerId = 1L;
+        when(auditRepository.findAuditsByPlayerIdByCreatedTime(playerId))
                 .thenReturn(List.of(
-                        new Audit(AuditType.REGISTRATION, loginPlayer, Instant.now()))
+                        new Audit(1L, AuditType.REGISTRATION, playerId, Instant.now()))
                 );
     }
 
@@ -47,12 +50,12 @@ class AuditServiceTest {
      * Тест сохранения аудита и его нахождения по логину пользователя
      */
     @Test
-    @DisplayName("Удачное создание и нахождение аудита по логину игрока")
+    @DisplayName("Удачное создание и нахождение аудита по идентификатору игрока")
     void createAndFindAuditByLoginPlayer() {
         AuditType auditType = AuditType.REGISTRATION;
-        service.addAudit(auditType, loginPlayer);
-        Audit foundAudit = service.findAuditsByLoginPlayer(loginPlayer).get(0);
-        Assertions.assertThat(foundAudit.loginPlayer().equals(loginPlayer) &&
+        service.addAudit(auditType, playerId);
+        Audit foundAudit = service.findAuditsByLoginPlayer(playerId).get(0);
+        Assertions.assertThat(foundAudit.playerId().equals(playerId) &&
                         foundAudit.type().equals(auditType))
                 .as("Аудит не соответствует ожиданиям")
                 .isTrue();

@@ -1,8 +1,8 @@
 package org.example.service;
 
 import org.example.model.Audit;
-import org.example.repository.AuditInMemoryRepository;
 import org.example.repository.AuditRepository;
+import org.example.repository.AuditRepositoryImpl;
 import org.example.util.AuditType;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class AuditServiceImpl implements AuditService {
     private final AuditRepository auditRepository;
 
     private AuditServiceImpl() {
-        this.auditRepository = new AuditInMemoryRepository();
+        this.auditRepository = new AuditRepositoryImpl();
     }
 
     public AuditServiceImpl(AuditRepository auditRepository) {
@@ -37,13 +37,13 @@ public class AuditServiceImpl implements AuditService {
 
 
     @Override
-    public void addAudit(AuditType auditType, String loginPlayer) {
-        auditRepository.addAudit(auditType, loginPlayer);
+    public void addAudit(AuditType auditType, Long playerId) {
+        auditRepository.addAudit(auditType, playerId);
     }
 
     public
     @Override
-    List<Audit> findAuditsByLoginPlayer(String login) {
-        return auditRepository.findAuditsByLoginPlayerByCreatedTime(login);
+    List<Audit> findAuditsByLoginPlayer(Long playerId) {
+        return auditRepository.findAuditsByPlayerIdByCreatedTime(playerId);
     }
 }

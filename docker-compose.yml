@@ -1,0 +1,12 @@
+version: "1.1"
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "walletService"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "pass"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/main/resources/db:/var/lib/postgresql/data

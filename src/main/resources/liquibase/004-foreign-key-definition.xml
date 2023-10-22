@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="foreignKeyChangeSetId" author="nikBakly">
+
+        <!--Добавление внешнего ключа от audits к players-->
+        <addForeignKeyConstraint baseTableName="audits" baseColumnNames="player_id"
+                                 constraintName="fr_audit_player"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <!--Добавление внешнего ключа от transactions к players-->
+        <addForeignKeyConstraint baseTableName="transactions" baseColumnNames="player_id"
+                                 constraintName="fr_transaction_player"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

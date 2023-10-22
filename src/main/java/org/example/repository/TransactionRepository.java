@@ -13,30 +13,18 @@ public interface TransactionRepository {
     /**
      * Метод для создания транзакции.
      *
-     * @param transactionId   уникальное id транзакции
-     * @param transactionType тип транзакции
-     * @param size            размер транзакции
-     * @param loginPlayer     логин игрока
+     * @param newTransaction новая транзакция
      * @throws SaveEntityException ошибка при попытке создания транзакции
      */
-    void createdTransaction(Long transactionId,
-                            TransactionType transactionType,
-                            Double size,
-                            String loginPlayer) throws SaveEntityException;
+    void createdTransaction(Transaction newTransaction) throws SaveEntityException;
 
     /**
-     * Метод для нахождения всех транзакций типа CREDIT по логину игрока и отсортированный по времени.
+     * Метод для нахождения всех транзакций определенного типа по логину игрока и отсортированный по времени.
      *
-     * @param loginPlayer логин игрока
-     * @return список всех транзакций типа CREDIT по логину игрока и отсортированный по времени
+     * @param playerId        идентификатор игрока
+     * @param transactionType тип транзакции
+     * @return список всех транзакций определенного типа по логину игрока и отсортированный по времени
      */
-    List<Transaction> findCreditHistoryTransactionsByCreatedTime(String loginPlayer);
+    List<Transaction> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType);
 
-    /**
-     * Метод для нахождения всех транзакций типа DEBIT по логину игрока и отсортированный по времени.
-     *
-     * @param loginPlayer логин игрока
-     * @return список всех транзакций типа DEBIT по логину игрока и отсортированный по времени
-     */
-    List<Transaction> findDebitHistoryTransactionsByCreatedTime(String loginPlayer);
 }

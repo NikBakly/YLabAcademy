@@ -12,16 +12,16 @@ public interface AuditService {
     /**
      * Метод для сохранения аудита.
      *
-     * @param auditType   тип аудита
-     * @param loginPlayer логин игрока, который был инициатором создания аудита
+     * @param auditType тип аудита
+     * @param playerId  идентификатор игрока, который был инициатором создания аудита
      */
-    void addAudit(AuditType auditType, String loginPlayer);
+    void addAudit(AuditType auditType, Long playerId);
 
     /**
      * Метод для нахождения всех аудитов игрока по его логину.
      *
-     * @param login логин игрока, который был инициатором создания аудита
+     * @param playerId идентификатор игрока, который был инициатором создания аудита
      */
-    List<Audit> findAuditsByLoginPlayer(String login);
+    List<Audit> findAuditsByLoginPlayer(Long playerId);
 
 }

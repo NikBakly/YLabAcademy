@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="create-table" author="nikBakly">
+        <!--Таблица для хранения игроков-->
+        <createTable tableName="players" schemaName="wallet">
+            <!--Идентификатор игрока-->
+            <column name="id" type="BIGINT" defaultValueComputed="nextval('wallet_sequence')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!--Логин игрока-->
+            <column name="login" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <!--Пароль игрока-->
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <!--Баланс игрока-->
+            <column name="balance" type="NUMERIC(11, 3)" defaultValue="0"/>
+        </createTable>
+
+        <!--Таблица для хранения аудитов игрока-->
+        <createTable tableName="audits" schemaName="wallet">
+            <!--Идентификатор аудита-->
+            <column name="id" type="BIGINT" defaultValueComputed="nextval('wallet_sequence')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!--Тип аудита-->
+            <column name="type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <!--Логин игрока, который создал аудит-->
+            <column name="player_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <!--Дата создания аудита аудит-->
+            <column name="created_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--Таблица для хранения транзакций игрока-->
+        <createTable tableName="transactions" schemaName="wallet">
+            <!--Идентификатор транзакции-->
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <!--Тип транзакции-->
+            <column name="type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <!--Размер транзакции-->
+            <column name="size" type="NUMERIC(11, 3)">
+                <constraints nullable="false"/>
+            </column>
+            <!--логин игрока, который создал транзакцию-->
+            <column name="player_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <!--дата создания транзакции-->
+            <column name="created_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

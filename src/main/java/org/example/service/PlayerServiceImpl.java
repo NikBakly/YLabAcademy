@@ -4,11 +4,13 @@ import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
 import org.example.exception.SaveEntityException;
 import org.example.model.Player;
-import org.example.repository.PlayerInMemoryRepository;
+import org.example.model.Transaction;
 import org.example.repository.PlayerRepository;
+import org.example.repository.PlayerRepositoryImpl;
 import org.example.util.TransactionType;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -22,11 +24,11 @@ public class PlayerServiceImpl implements PlayerService {
 
 
     private PlayerServiceImpl() {
-        this.playerRepository = new PlayerInMemoryRepository();
+        this.playerRepository = new PlayerRepositoryImpl();
         this.transactionService = TransactionServiceImpl.getInstance();
     }
 
-    public PlayerServiceImpl(PlayerRepository playerRepository, TransactionServiceImpl transactionService) {
+    public PlayerServiceImpl(PlayerRepository playerRepository, TransactionService transactionService) {
         this.playerRepository = playerRepository;
         this.transactionService = transactionService;
     }
@@ -65,7 +67,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public void debitForPlayer(String loginPlayer, long transactionId, double debitSize) throws RuntimeException {
+    public Player debitForPlayer(String loginPlayer, long transactionId, double debitSize) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
         BigDecimal bigDecimalDebit = BigDecimal.valueOf(debitSize);
@@ -75,16 +77,23 @@ public class PlayerServiceImpl implements PlayerService {
         if (comparisonResult < 0) {
             throw new InvalidInputException("У вас нету столько средств на балансе.");
         }
-        transactionService.createTransaction(transactionId, TransactionType.DEBIT, debitSize, foundPlayer.getLogin());
+        transactionService.createTransaction(
+                new Transaction(transactionId, TransactionType.DEBIT, debitSize, foundPlayer.getId(), Instant.now()));
+
         foundPlayer.setBalance(balancePlayer.subtract(bigDecimalDebit));
+        playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
+        return foundPlayer;
     }
 
     @Override
-    public void creditForPlayer(String loginPlayer, long transactionId, double creditSize) throws RuntimeException {
+    public Player creditForPlayer(String loginPlayer, long transactionId, double creditSize) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
-        transactionService.createTransaction(transactionId, TransactionType.CREDIT, creditSize, foundPlayer.getLogin());
+        transactionService.createTransaction(
+                new Transaction(transactionId, TransactionType.CREDIT, creditSize, foundPlayer.getId(), Instant.now()));
         foundPlayer.setBalance(balancePlayer.add(BigDecimal.valueOf(creditSize)));
+        playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
+        return foundPlayer;
     }
 
     private Player findAndCheckPlayerByLogin(String loginPlayer) throws NotFoundException {
