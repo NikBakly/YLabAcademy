@@ -19,17 +19,17 @@ import static org.mockito.Mockito.when;
  */
 class AuditServiceTest {
     static AuditService service;
-    static String loginPlayer;
+    static Long playerId;
 
     @BeforeAll
     static void init() {
         AuditRepository auditRepository = Mockito.mock(AuditRepository.class);
 
         service = new AuditServiceImpl(auditRepository);
-        loginPlayer = "tester";
-        when(auditRepository.findAuditsByLoginPlayerByCreatedTime(loginPlayer))
+        playerId = 1L;
+        when(auditRepository.findAuditsByPlayerIdByCreatedTime(playerId))
                 .thenReturn(List.of(
-                        new Audit(1L, AuditType.REGISTRATION, loginPlayer, Instant.now()))
+                        new Audit(1L, AuditType.REGISTRATION, playerId, Instant.now()))
                 );
     }
 
@@ -50,12 +50,12 @@ class AuditServiceTest {
      * Тест сохранения аудита и его нахождения по логину пользователя
      */
     @Test
-    @DisplayName("Удачное создание и нахождение аудита по логину игрока")
+    @DisplayName("Удачное создание и нахождение аудита по идентификатору игрока")
     void createAndFindAuditByLoginPlayer() {
         AuditType auditType = AuditType.REGISTRATION;
-        service.addAudit(auditType, loginPlayer);
-        Audit foundAudit = service.findAuditsByLoginPlayer(loginPlayer).get(0);
-        Assertions.assertThat(foundAudit.loginPlayer().equals(loginPlayer) &&
+        service.addAudit(auditType, playerId);
+        Audit foundAudit = service.findAuditsByLoginPlayer(playerId).get(0);
+        Assertions.assertThat(foundAudit.playerId().equals(playerId) &&
                         foundAudit.type().equals(auditType))
                 .as("Аудит не соответствует ожиданиям")
                 .isTrue();

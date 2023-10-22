@@ -11,6 +11,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Instant;
+
 /**
  * Класс для тестирования TransactionInMemoryRepository
  */
@@ -24,13 +26,13 @@ class TransactionRepositoryTest {
 
     static TransactionRepository repository;
     static Double sizeTransaction;
-    static String loginPlayer;
+    static Long playerId;
     static Long transactionId;
 
     @BeforeAll
     static void init() {
         sizeTransaction = 120.0;
-        loginPlayer = "tester";
+        playerId = 1L;
         transactionId = 1L;
     }
 
@@ -56,15 +58,16 @@ class TransactionRepositoryTest {
      * Тестирование создания транзакций типа CREDIT и показ истории таких транзакций
      */
     @Test
-    @DisplayName("Удачное создание транзакции типа CREDIT и нахождения ее по логину пользователя.")
+    @DisplayName("Удачное создание транзакции типа CREDIT и нахождения ее по идентификатору игрока.")
     void createdTransactionAndFindCreditHistoryTransactions() {
         TransactionType transactionType = TransactionType.CREDIT;
-        repository.createdTransaction(transactionId, transactionType, sizeTransaction, loginPlayer);
+        repository.createdTransaction(
+                new Transaction(transactionId, transactionType, sizeTransaction, playerId, Instant.now()));
 
         //Достаем единственную транзакцию из истории пользователя
         Transaction foundTransaction =
-                repository.findHistoryTransactionsByCreatedTime(loginPlayer, TransactionType.CREDIT).get(0);
-        Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
+                repository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.CREDIT).get(0);
+        Assertions.assertThat(foundTransaction.playerId().equals(playerId)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
                 .isTrue();
@@ -74,14 +77,15 @@ class TransactionRepositoryTest {
      * Тестирование создания транзакций типа DEBIT и показ истории таких транзакций
      */
     @Test
-    @DisplayName("Удачное создание транзакции типа DEBIT и нахождения ее по логину пользователя.")
+    @DisplayName("Удачное создание транзакции типа DEBIT и нахождения ее по идентификатору игрока.")
     void createdTransactionAndFindDebitHistoryTransactions() {
         TransactionType transactionType = TransactionType.DEBIT;
-        repository.createdTransaction(transactionId, transactionType, sizeTransaction, loginPlayer);
+        repository.createdTransaction(
+                new Transaction(transactionId, transactionType, sizeTransaction, playerId, Instant.now()));
         //Достаем единственную транзакцию из истории пользователя
         Transaction foundTransaction =
-                repository.findHistoryTransactionsByCreatedTime(loginPlayer, TransactionType.DEBIT).get(0);
-        Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
+                repository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.DEBIT).get(0);
+        Assertions.assertThat(foundTransaction.playerId().equals(playerId)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
                 .isTrue();
@@ -93,9 +97,12 @@ class TransactionRepositoryTest {
     @Test
     @DisplayName("Не удачное создание транзакции с не уникальным id.")
     void createdDebitTransactionWhenTransactionSizeIsLargerThanPlayerPersonalFund() {
-        repository.createdTransaction(transactionId, TransactionType.CREDIT, sizeTransaction, loginPlayer);
+        repository.createdTransaction(
+                new Transaction(transactionId, TransactionType.CREDIT, sizeTransaction, playerId, Instant.now()));
         Throwable thrown = Assertions.catchThrowable(() ->
-                repository.createdTransaction(transactionId, TransactionType.CREDIT, sizeTransaction, loginPlayer));
+                repository.createdTransaction(
+                        new Transaction(transactionId, TransactionType.CREDIT, sizeTransaction, playerId, Instant.now())
+                ));
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
                 .isInstanceOf(SaveEntityException.class);

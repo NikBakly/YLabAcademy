@@ -39,7 +39,6 @@ public class LiquibaseManager {
             updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, properties.getProperty("changeLogFile"));
             updateCommand.execute();
 
-
             connection.close();
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -52,7 +51,7 @@ public class LiquibaseManager {
      * @param connection подключение к бд
      */
     private static void createSchemaForLiquibaseTables(Connection connection) {
-        String createSchemaSQL = "CREATE SCHEMA migration";
+        String createSchemaSQL = "CREATE SCHEMA IF NOT EXISTS migration";
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(createSchemaSQL);

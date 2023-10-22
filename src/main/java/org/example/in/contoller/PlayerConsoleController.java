@@ -98,7 +98,7 @@ public class PlayerConsoleController {
         int typeOperation = consoleReader.readTypeOperation();
         switch (typeOperation) {
             case EXIT_CODE -> {
-                auditService.addAudit(AuditType.EXIT, playerNow.getLogin());
+                auditService.addAudit(AuditType.EXIT, playerNow.getId());
                 isFinish = true;
             }
             case REGISTRATION_CODE -> registerPlayer();
@@ -110,7 +110,7 @@ public class PlayerConsoleController {
             case DEBIT_HISTORY_CODE -> printDebitHistory();
             case AUDIT_CODE -> printAudit();
             default -> {
-                auditService.addAudit(AuditType.ERROR_ENTERING_COMMAND, playerNow.getLogin());
+                auditService.addAudit(AuditType.ERROR_ENTERING_COMMAND, playerNow.getId());
                 System.out.println(BasicPhrases.COMMAND_NOT_FOUND);
             }
 
@@ -123,18 +123,18 @@ public class PlayerConsoleController {
      * @throws Exception ошибка при попытке регистрации
      */
     private void registerPlayer() throws Exception {
-        String previousLoginPlayer = null;
+        Long previousPlayerId = null;
         if (playerNow != null) {
-            previousLoginPlayer = playerNow.getLogin();
+            previousPlayerId = playerNow.getId();
         }
         System.out.println(BasicPhrases.REQUEST_LOGIN_AND_PASSWORD);
         String login = consoleReader.readStringInfo();
         String password = consoleReader.readStringInfo();
         playerNow = playerService.registration(login, password);
-        if (previousLoginPlayer != null) {
-            auditService.addAudit(AuditType.EXIT, previousLoginPlayer);
+        if (previousPlayerId != null) {
+            auditService.addAudit(AuditType.EXIT, previousPlayerId);
         }
-        auditService.addAudit(AuditType.REGISTRATION, playerNow.getLogin());
+        auditService.addAudit(AuditType.REGISTRATION, playerNow.getId());
     }
 
     /**
@@ -143,18 +143,18 @@ public class PlayerConsoleController {
      * @throws Exception ошибка при попытке аутентификации
      */
     private void authenticatePlayer() throws Exception {
-        String previousLoginPlayer = null;
+        Long previousPlayerId = null;
         if (playerNow != null) {
-            previousLoginPlayer = playerNow.getLogin();
+            previousPlayerId = playerNow.getId();
         }
         System.out.println(BasicPhrases.REQUEST_LOGIN_AND_PASSWORD);
         String login = consoleReader.readStringInfo();
         String password = consoleReader.readStringInfo();
         playerNow = playerService.authorization(login, password);
-        if (previousLoginPlayer != null) {
-            auditService.addAudit(AuditType.EXIT, previousLoginPlayer);
+        if (previousPlayerId != null) {
+            auditService.addAudit(AuditType.EXIT, previousPlayerId);
         }
-        auditService.addAudit(AuditType.AUTHORIZATION, playerNow.getLogin());
+        auditService.addAudit(AuditType.AUTHORIZATION, playerNow.getId());
     }
 
     /**
@@ -162,7 +162,7 @@ public class PlayerConsoleController {
      */
     private void printBalancePlayer() {
         System.out.println("Ваш баланс:" + playerNow.getBalance());
-        auditService.addAudit(AuditType.BALANCE_REQUEST, playerNow.getLogin());
+        auditService.addAudit(AuditType.BALANCE_REQUEST, playerNow.getId());
     }
 
     /**
@@ -177,7 +177,7 @@ public class PlayerConsoleController {
         double debitSize = consoleReader.readDoubleNumber();
         playerNow = playerService.debitForPlayer(playerNow.getLogin(), transactionId, debitSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
-        auditService.addAudit(AuditType.DEBIT, playerNow.getLogin());
+        auditService.addAudit(AuditType.DEBIT, playerNow.getId());
     }
 
     /**
@@ -192,15 +192,15 @@ public class PlayerConsoleController {
         double creditSize = consoleReader.readDoubleNumber();
         playerNow = playerService.creditForPlayer(playerNow.getLogin(), transactionId, creditSize);
         System.out.println(BasicPhrases.SUCCESSFUL_OPERATION);
-        auditService.addAudit(AuditType.CREDIT, playerNow.getLogin());
+        auditService.addAudit(AuditType.CREDIT, playerNow.getId());
     }
 
     /**
      * Метод выводит в консоль историю пополнений.
      */
     private void printCreditHistory() {
-        System.out.println(transactionService.getHistoryTransactions(playerNow.getLogin(), TransactionType.CREDIT));
-        auditService.addAudit(AuditType.REQUEST_CREDIT_HISTORY, playerNow.getLogin());
+        System.out.println(transactionService.getHistoryTransactions(playerNow.getId(), TransactionType.CREDIT));
+        auditService.addAudit(AuditType.REQUEST_CREDIT_HISTORY, playerNow.getId());
 
     }
 
@@ -208,14 +208,14 @@ public class PlayerConsoleController {
      * Метод выводит в консоль историю снятия.
      */
     private void printDebitHistory() {
-        System.out.println(transactionService.getHistoryTransactions(playerNow.getLogin(), TransactionType.DEBIT));
-        auditService.addAudit(AuditType.REQUEST_DEBIT_HISTORY, playerNow.getLogin());
+        System.out.println(transactionService.getHistoryTransactions(playerNow.getId(), TransactionType.DEBIT));
+        auditService.addAudit(AuditType.REQUEST_DEBIT_HISTORY, playerNow.getId());
     }
 
     /**
      * Метод выводит в консоль историю действий игрока.
      */
     private void printAudit() {
-        System.out.println(auditService.findAuditsByLoginPlayer(playerNow.getLogin()));
+        System.out.println(auditService.findAuditsByLoginPlayer(playerNow.getId()));
     }
 }

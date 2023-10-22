@@ -37,13 +37,13 @@ public class AuditServiceImpl implements AuditService {
 
 
     @Override
-    public void addAudit(AuditType auditType, String loginPlayer) {
-        auditRepository.addAudit(auditType, loginPlayer);
+    public void addAudit(AuditType auditType, Long playerId) {
+        auditRepository.addAudit(auditType, playerId);
     }
 
     public
     @Override
-    List<Audit> findAuditsByLoginPlayer(String login) {
-        return auditRepository.findAuditsByLoginPlayerByCreatedTime(login);
+    List<Audit> findAuditsByLoginPlayer(Long playerId) {
+        return auditRepository.findAuditsByPlayerIdByCreatedTime(playerId);
     }
 }

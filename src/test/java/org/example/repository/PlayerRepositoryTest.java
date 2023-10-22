@@ -63,22 +63,18 @@ class PlayerRepositoryTest {
     @DisplayName("Удачное создание и нахождения игрока по его логину")
     void saveAndFindPlayerByLogin() {
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
-        Optional<Player> foundPlayer = repository.findByLogin(expectedLoginPlayer);
-        if (foundPlayer.isPresent()) {
-            Assertions.assertThat(expectedLoginPlayer)
-                    .as("Логины не равны.")
-                    .isEqualTo(foundPlayer.get().getLogin());
-            Assertions.assertThat(expectedPasswordPlayer)
-                    .as("Пароли не равны.")
-                    .isEqualTo(foundPlayer.get().getPassword());
-            BigDecimal expectedBalance = BigDecimal.valueOf(0);
-            int resultComparing = expectedBalance.compareTo(foundPlayer.get().getBalance());
-            Assertions.assertThat(resultComparing == 0)
-                    .as("Балансы не равные.")
-                    .isTrue();
-        } else {
-            Assertions.fail("Игрок не найдена");
-        }
+        Player foundPlayer = repository.findByLogin(expectedLoginPlayer).get();
+        Assertions.assertThat(expectedLoginPlayer)
+                .as("Логины не равны.")
+                .isEqualTo(foundPlayer.getLogin());
+        Assertions.assertThat(expectedPasswordPlayer)
+                .as("Пароли не равны.")
+                .isEqualTo(foundPlayer.getPassword());
+        BigDecimal expectedBalance = BigDecimal.valueOf(0);
+        int resultComparing = expectedBalance.compareTo(foundPlayer.getBalance());
+        Assertions.assertThat(resultComparing == 0)
+                .as("Балансы не равные.")
+                .isTrue();
     }
 
     /**

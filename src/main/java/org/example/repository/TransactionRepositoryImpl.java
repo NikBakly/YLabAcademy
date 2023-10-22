@@ -6,15 +6,14 @@ import org.example.util.DatabaseConnector;
 import org.example.util.TransactionType;
 
 import java.sql.*;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionRepositoryImpl implements TransactionRepository {
     private static final String INSERT_SQL =
-            "INSERT INTO wallet.transactions (id, type, size, login_player, created_time) VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO wallet.transactions (id, type, size, player_id, created_time) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_CREDIT_SQL =
-            "SELECT * FROM wallet.transactions WHERE login_player = ? AND type = ? ORDER BY created_time";
+            "SELECT * FROM wallet.transactions WHERE player_id = ? AND type = ? ORDER BY created_time";
 
     private final String jdbcUrl;
     private final String jdbcUsername;
@@ -33,20 +32,17 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public void createdTransaction(Long transactionId,
-                                   TransactionType transactionType,
-                                   Double transactionSize,
-                                   String loginPlayer) throws SaveEntityException {
+    public void createdTransaction(Transaction newTransaction) throws SaveEntityException {
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
-            preparedStatement.setLong(1, transactionId);
-            preparedStatement.setString(2, transactionType.toString());
-            preparedStatement.setDouble(3, transactionSize);
-            preparedStatement.setString(4, loginPlayer);
-            preparedStatement.setTimestamp(5, Timestamp.from(Instant.now()));
+            preparedStatement.setLong(1, newTransaction.id());
+            preparedStatement.setString(2, newTransaction.type().toString());
+            preparedStatement.setDouble(3, newTransaction.size());
+            preparedStatement.setLong(4, newTransaction.playerId());
+            preparedStatement.setTimestamp(5, Timestamp.from(newTransaction.createdTime()));
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted == 0) {
-                System.err.printf("Транзакция id=%d не сохранилась.%n", transactionId);
+                System.err.printf("Транзакция id=%d не сохранилась.%n", newTransaction.id());
             }
         } catch (SQLException e) {
             throw new SaveEntityException(e.getMessage());
@@ -54,11 +50,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> findHistoryTransactionsByCreatedTime(String loginPlayer, TransactionType transactionType) {
+    public List<Transaction> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType) {
         List<Transaction> foundTransactions = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_CREDIT_SQL)) {
-            preparedStatement.setString(1, loginPlayer);
+            preparedStatement.setLong(1, playerId);
             preparedStatement.setString(2, transactionType.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -66,13 +62,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TransactionType type = resultSet.getString("type")
                         .transform(TransactionType::valueOf);
                 Double transactionSize = resultSet.getDouble("size");
-                String transactionLoginPlayer = resultSet.getString("login_player");
+                Long transactionPlayerId = resultSet.getLong("player_id");
                 Timestamp transactionCreatedTime = resultSet.getTimestamp("created_time");
                 foundTransactions.add(new Transaction(
                         transactionId,
                         type,
                         transactionSize,
-                        transactionLoginPlayer,
+                        transactionPlayerId,
                         transactionCreatedTime.toInstant()
                 ));
             }

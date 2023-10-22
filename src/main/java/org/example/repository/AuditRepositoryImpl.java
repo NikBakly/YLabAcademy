@@ -11,10 +11,9 @@ import java.util.List;
 
 public class AuditRepositoryImpl implements AuditRepository {
     private static final String INSERT_SQL =
-            "INSERT INTO wallet.audits (type, login_player, created_time) VALUES (?, ?, ?)";
+            "INSERT INTO wallet.audits (type, player_id, created_time) VALUES (?, ?, ?)";
     private static final String SELECT_SQL =
-            "SELECT * FROM wallet.audits WHERE login_player = ? ORDER BY created_time";
-
+            "SELECT * FROM wallet.audits WHERE player_id = ? ORDER BY created_time";
 
     private final String jdbcUrl;
     private final String jdbcUsername;
@@ -43,15 +42,15 @@ public class AuditRepositoryImpl implements AuditRepository {
     }
 
     @Override
-    public void addAudit(AuditType auditType, String loginPlayer) {
+    public void addAudit(AuditType auditType, Long playerId) {
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setString(1, auditType.toString());
-            preparedStatement.setString(2, loginPlayer);
+            preparedStatement.setLong(2, playerId);
             preparedStatement.setTimestamp(3, Timestamp.from(Instant.now()));
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted == 0) {
-                System.err.printf("У игрока с login=%s не сохранился аудит.%n", loginPlayer);
+                System.err.printf("У игрока с login=%s не сохранился аудит.%n", playerId);
             }
         } catch (SQLException e) {
             System.err.printf(e.getMessage());
@@ -59,23 +58,23 @@ public class AuditRepositoryImpl implements AuditRepository {
     }
 
     @Override
-    public List<Audit> findAuditsByLoginPlayerByCreatedTime(String loginPlayer) {
+    public List<Audit> findAuditsByPlayerIdByCreatedTime(Long playerId) {
         List<Audit> foundAudits = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
-            preparedStatement.setString(1, loginPlayer);
+            preparedStatement.setLong(1, playerId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Long auditId = resultSet.getLong("id");
                 AuditType auditType = resultSet.getString("type")
                         .transform(AuditType::valueOf);
-                String auditLoginPlayer = resultSet.getString("login_player");
+                Long auditPlayerId = resultSet.getLong("player_id");
                 Timestamp auditCreatedTime = resultSet.getTimestamp("created_time");
                 foundAudits.add(new Audit(
                         auditId,
                         auditType,
-                        auditLoginPlayer,
+                        auditPlayerId,
                         auditCreatedTime.toInstant()
                 ));
             }

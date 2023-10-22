@@ -51,21 +51,21 @@ class AuditRepositoryTest {
      * Тест для проверки сохранений различных аудитов и последующего их нахождения по логину игрока.
      */
     @Test
-    @DisplayName("Удачное создание аудитов и их нахождения по логину игрока")
+    @DisplayName("Удачное создание аудитов и их нахождения по идентификатору игрока")
     void addAndFindAuditsByLoginPlayer() {
-        String loginPlayer = "tester";
+        Long playerId = 1L;
         // заполняем различными действиями пользователя
-        repository.addAudit(AuditType.REGISTRATION, loginPlayer);
-        repository.addAudit(AuditType.BALANCE_REQUEST, loginPlayer);
-        repository.addAudit(AuditType.EXIT, loginPlayer);
-        repository.addAudit(AuditType.AUTHORIZATION, loginPlayer);
-        repository.addAudit(AuditType.CREDIT, loginPlayer);
-        repository.addAudit(AuditType.DEBIT, loginPlayer);
-        repository.addAudit(AuditType.REQUEST_DEBIT_HISTORY, loginPlayer);
-        repository.addAudit(AuditType.REQUEST_CREDIT_HISTORY, loginPlayer);
-        repository.addAudit(AuditType.ERROR_ENTERING_COMMAND, loginPlayer);
+        repository.addAudit(AuditType.REGISTRATION, playerId);
+        repository.addAudit(AuditType.BALANCE_REQUEST, playerId);
+        repository.addAudit(AuditType.EXIT, playerId);
+        repository.addAudit(AuditType.AUTHORIZATION, playerId);
+        repository.addAudit(AuditType.CREDIT, playerId);
+        repository.addAudit(AuditType.DEBIT, playerId);
+        repository.addAudit(AuditType.REQUEST_DEBIT_HISTORY, playerId);
+        repository.addAudit(AuditType.REQUEST_CREDIT_HISTORY, playerId);
+        repository.addAudit(AuditType.ERROR_ENTERING_COMMAND, playerId);
 
-        List<Audit> foundedAudits = repository.findAuditsByLoginPlayerByCreatedTime(loginPlayer);
+        List<Audit> foundedAudits = repository.findAuditsByPlayerIdByCreatedTime(playerId);
         int expectedAuditsSize = 9;
 
         Assertions.assertThat(expectedAuditsSize)

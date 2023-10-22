@@ -37,16 +37,13 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void createTransaction(Long transactionId,
-                                  TransactionType transactionType,
-                                  Double size,
-                                  String loginPlayer) throws SaveEntityException {
-        transactionRepository.createdTransaction(transactionId, transactionType, size, loginPlayer);
+    public void createTransaction(Transaction newTransaction) throws SaveEntityException {
+        transactionRepository.createdTransaction(newTransaction);
     }
 
     @Override
-    public List<Transaction> getHistoryTransactions(String loginPlayer, TransactionType transactionType) {
-        return transactionRepository.findHistoryTransactionsByCreatedTime(loginPlayer, transactionType);
+    public List<Transaction> getHistoryTransactions(Long playerId, TransactionType transactionType) {
+        return transactionRepository.findHistoryTransactionsByCreatedTime(playerId, transactionType);
     }
 
 }
