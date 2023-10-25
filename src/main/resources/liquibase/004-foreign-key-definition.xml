@@ -7,13 +7,15 @@
     <changeSet id="foreignKeyChangeSetId" author="nikBakly">
 
         <!--Добавление внешнего ключа от audits к players-->
-        <addForeignKeyConstraint baseTableName="audits" baseColumnNames="player_id"
+        <addForeignKeyConstraint baseTableSchemaName="wallet" referencedTableSchemaName="wallet"
+                                 baseTableName="audits" baseColumnNames="player_id"
                                  constraintName="fr_audit_player"
                                  referencedTableName="players" referencedColumnNames="id"
                                  onDelete="CASCADE"/>
 
         <!--Добавление внешнего ключа от transactions к players-->
-        <addForeignKeyConstraint baseTableName="transactions" baseColumnNames="player_id"
+        <addForeignKeyConstraint baseTableSchemaName="wallet" referencedTableSchemaName="wallet"
+                                 baseTableName="transactions" baseColumnNames="player_id"
                                  constraintName="fr_transaction_player"
                                  referencedTableName="players" referencedColumnNames="id"
                                  onDelete="CASCADE"/>

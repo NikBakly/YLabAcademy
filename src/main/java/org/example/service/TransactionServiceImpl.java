@@ -1,5 +1,7 @@
 package org.example.service;
 
+import org.example.aop.annotations.Loggable;
+import org.example.dto.TransactionResponseDto;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
 import org.example.repository.TransactionRepository;
@@ -11,6 +13,7 @@ import java.util.List;
 /**
  * Класс реализующий бизнес-логику для сущности Transaction.
  */
+@Loggable
 public class TransactionServiceImpl implements TransactionService {
     private static TransactionServiceImpl instance;
 
@@ -42,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getHistoryTransactions(Long playerId, TransactionType transactionType) {
+    public List<TransactionResponseDto> getHistoryTransactions(Long playerId, TransactionType transactionType) {
         return transactionRepository.findHistoryTransactionsByCreatedTime(playerId, transactionType);
     }
 

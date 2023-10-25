@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.assertj.core.api.Assertions;
+import org.example.dto.TransactionResponseDto;
 import org.example.model.Transaction;
 import org.example.repository.TransactionRepository;
 import org.example.util.TransactionType;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.when;
 class TransactionServiceTest {
     static long transactionId;
     static long playerId;
+    static String loginPlayer;
     static TransactionType creditTransactionType;
     static TransactionType debitTransactionType;
     static double transactionSize;
@@ -29,6 +31,7 @@ class TransactionServiceTest {
     static void init() {
         transactionId = 1;
         playerId = 1;
+        loginPlayer = "tester";
         creditTransactionType = TransactionType.CREDIT;
         debitTransactionType = TransactionType.DEBIT;
         transactionSize = 1000;
@@ -37,19 +40,19 @@ class TransactionServiceTest {
         transactionService = new TransactionServiceImpl(transactionRepository);
 
         when(transactionRepository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.DEBIT))
-                .thenReturn(List.of(new Transaction(
+                .thenReturn(List.of(new TransactionResponseDto(
                         transactionId,
                         debitTransactionType,
                         transactionSize,
-                        playerId,
+                        loginPlayer,
                         Instant.now())
                 ));
         when(transactionRepository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.CREDIT))
-                .thenReturn(List.of(new Transaction(
+                .thenReturn(List.of(new TransactionResponseDto(
                         transactionId,
                         creditTransactionType,
                         transactionSize,
-                        playerId,
+                        loginPlayer,
                         Instant.now())
                 ));
     }
@@ -76,7 +79,7 @@ class TransactionServiceTest {
     void createAndGetHistoryDebitTransactions() {
         transactionService.createTransaction(
                 new Transaction(transactionId, debitTransactionType, transactionSize, playerId, Instant.now()));
-        List<Transaction> foundTransactions =
+        List<TransactionResponseDto> foundTransactions =
                 transactionService.getHistoryTransactions(playerId, TransactionType.DEBIT);
 
         int expectedSizeList = 1;
@@ -84,8 +87,8 @@ class TransactionServiceTest {
                 .as("Ожидаемый размер списка не совпадает с результатом")
                 .isEqualTo(foundTransactions.size());
 
-        Transaction foundTransaction = foundTransactions.get(0);
-        Assertions.assertThat(foundTransaction.playerId().equals(playerId) &&
+        TransactionResponseDto foundTransaction = foundTransactions.get(0);
+        Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer) &&
                         foundTransaction.type().equals(debitTransactionType) &&
                         foundTransaction.id().equals(transactionId) &&
                         foundTransaction.size().equals(transactionSize))
@@ -101,7 +104,7 @@ class TransactionServiceTest {
     void createAndGetHistoryCreditTransactions() {
         transactionService.createTransaction(
                 new Transaction(transactionId, creditTransactionType, transactionSize, playerId, Instant.now()));
-        List<Transaction> foundTransactions =
+        List<TransactionResponseDto> foundTransactions =
                 transactionService.getHistoryTransactions(playerId, TransactionType.CREDIT);
 
         int expectedSizeList = 1;
@@ -109,8 +112,8 @@ class TransactionServiceTest {
                 .as("Ожидаемый размер списка не совпадает с результатом")
                 .isEqualTo(foundTransactions.size());
 
-        Transaction foundTransaction = foundTransactions.get(0);
-        Assertions.assertThat(foundTransaction.playerId().equals(playerId) &&
+        TransactionResponseDto foundTransaction = foundTransactions.get(0);
+        Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer) &&
                         foundTransaction.type().equals(creditTransactionType) &&
                         foundTransaction.id().equals(transactionId) &&
                         foundTransaction.size().equals(transactionSize))

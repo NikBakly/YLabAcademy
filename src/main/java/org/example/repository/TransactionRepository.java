@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import org.example.dto.TransactionResponseDto;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
 import org.example.util.TransactionType;
@@ -25,6 +26,6 @@ public interface TransactionRepository {
      * @param transactionType тип транзакции
      * @return список всех транзакций определенного типа по логину игрока и отсортированный по времени
      */
-    List<Transaction> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType);
+    List<TransactionResponseDto> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType);
 
 }

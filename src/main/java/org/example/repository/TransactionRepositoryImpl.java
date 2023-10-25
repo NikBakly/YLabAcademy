@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import org.example.dto.TransactionResponseDto;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
 import org.example.util.DatabaseConnector;
@@ -12,8 +13,12 @@ import java.util.List;
 public class TransactionRepositoryImpl implements TransactionRepository {
     private static final String INSERT_SQL =
             "INSERT INTO wallet.transactions (id, type, size, player_id, created_time) VALUES (?, ?, ?, ?, ?)";
-    private static final String SELECT_CREDIT_SQL =
-            "SELECT * FROM wallet.transactions WHERE player_id = ? AND type = ? ORDER BY created_time";
+    private static final String SELECT_SQL =
+            "SELECT t.id, t.type, t.size, t.created_time, p.login " +
+                    "FROM wallet.transactions AS t " +
+                    "JOIN wallet.players AS p ON t.player_id = p.id " +
+                    "WHERE player_id = ? AND type = ? " +
+                    "ORDER BY created_time";
 
     private final String jdbcUrl;
     private final String jdbcUsername;
@@ -50,10 +55,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType) {
-        List<Transaction> foundTransactions = new ArrayList<>();
+    public List<TransactionResponseDto> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType) {
+        List<TransactionResponseDto> foundTransactions = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_CREDIT_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             preparedStatement.setLong(1, playerId);
             preparedStatement.setString(2, transactionType.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -62,13 +67,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TransactionType type = resultSet.getString("type")
                         .transform(TransactionType::valueOf);
                 Double transactionSize = resultSet.getDouble("size");
-                Long transactionPlayerId = resultSet.getLong("player_id");
+                String transactionLoginPlayer = resultSet.getString("login");
                 Timestamp transactionCreatedTime = resultSet.getTimestamp("created_time");
-                foundTransactions.add(new Transaction(
+                foundTransactions.add(new TransactionResponseDto(
                         transactionId,
                         type,
                         transactionSize,
-                        transactionPlayerId,
+                        transactionLoginPlayer,
                         transactionCreatedTime.toInstant()
                 ));
             }

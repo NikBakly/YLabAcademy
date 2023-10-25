@@ -21,6 +21,8 @@ public class LiquibaseManager {
      */
     public static void runDatabaseMigrations(String url, String username, String password) {
         try {
+            Class.forName("org.postgresql.Driver");
+
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             String propertiesFile = "liquibase/liquibase.properties";
             Properties properties = new Properties();

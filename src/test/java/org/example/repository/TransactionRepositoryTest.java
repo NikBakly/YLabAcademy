@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.assertj.core.api.Assertions;
+import org.example.dto.TransactionResponseDto;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
 import org.example.util.DatabaseConnector;
@@ -26,13 +27,15 @@ class TransactionRepositoryTest {
 
     static TransactionRepository repository;
     static Double sizeTransaction;
+    static String loginPlayer;
     static Long playerId;
     static Long transactionId;
 
     @BeforeAll
     static void init() {
-        sizeTransaction = 120.0;
         playerId = 1L;
+        sizeTransaction = 120.0;
+        loginPlayer = "tester";
         transactionId = 1L;
     }
 
@@ -65,9 +68,9 @@ class TransactionRepositoryTest {
                 new Transaction(transactionId, transactionType, sizeTransaction, playerId, Instant.now()));
 
         //Достаем единственную транзакцию из истории пользователя
-        Transaction foundTransaction =
+        TransactionResponseDto foundTransaction =
                 repository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.CREDIT).get(0);
-        Assertions.assertThat(foundTransaction.playerId().equals(playerId)
+        Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
                 .isTrue();
@@ -83,9 +86,9 @@ class TransactionRepositoryTest {
         repository.createdTransaction(
                 new Transaction(transactionId, transactionType, sizeTransaction, playerId, Instant.now()));
         //Достаем единственную транзакцию из истории пользователя
-        Transaction foundTransaction =
+        TransactionResponseDto foundTransaction =
                 repository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.DEBIT).get(0);
-        Assertions.assertThat(foundTransaction.playerId().equals(playerId)
+        Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
                 .isTrue();
