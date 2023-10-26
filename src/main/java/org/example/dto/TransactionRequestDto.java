@@ -7,11 +7,9 @@ import org.example.util.TransactionType;
  *
  * @param id       идентификатор транзакции
  * @param type     тип транзакции
- * @param playerId идентификатор игрока, который был инициатором создания транзакции
  * @param size     размер транзакции
  */
 public record TransactionRequestDto(Long id,
                                     TransactionType type,
-                                    Long playerId,
                                     Double size) {
 }

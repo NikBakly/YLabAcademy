@@ -9,7 +9,6 @@ class PlayerRegistrationServletTest {
     @Mock
     private PlayerService playerService;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);

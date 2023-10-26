@@ -80,7 +80,7 @@ class TransactionServiceTest {
         transactionService.createTransaction(
                 new Transaction(transactionId, debitTransactionType, transactionSize, playerId, Instant.now()));
         List<TransactionResponseDto> foundTransactions =
-                transactionService.getHistoryTransactions(playerId, TransactionType.DEBIT);
+                transactionService.findHistoryTransactions(playerId, TransactionType.DEBIT);
 
         int expectedSizeList = 1;
         Assertions.assertThat(expectedSizeList)
@@ -105,7 +105,7 @@ class TransactionServiceTest {
         transactionService.createTransaction(
                 new Transaction(transactionId, creditTransactionType, transactionSize, playerId, Instant.now()));
         List<TransactionResponseDto> foundTransactions =
-                transactionService.getHistoryTransactions(playerId, TransactionType.CREDIT);
+                transactionService.findHistoryTransactions(playerId, TransactionType.CREDIT);
 
         int expectedSizeList = 1;
         Assertions.assertThat(expectedSizeList)

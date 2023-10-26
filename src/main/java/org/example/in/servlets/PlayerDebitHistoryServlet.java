@@ -1,6 +1,7 @@
 package org.example.in.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -26,22 +27,27 @@ public class PlayerDebitHistoryServlet extends HttpServlet {
     private ObjectMapper objectMapper;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String jwtToken = req.getHeader("Authorization");
         Long playerId = Jwts.parser()
                 .setSigningKey(JwtUtil.secret)
                 .parseClaimsJws(jwtToken)
                 .getBody().get("id", Long.class);
-        List<TransactionResponseDto> transactionsResponseDto =
-                transactionService.getHistoryTransactions(playerId, TransactionType.DEBIT);
-        resp.getWriter().write(objectMapper.writeValueAsString(transactionsResponseDto));
-        resp.setStatus(HttpServletResponse.SC_OK);
+        try {
+            List<TransactionResponseDto> transactionsResponseDto =
+                    transactionService.findHistoryTransactions(playerId, TransactionType.DEBIT);
+            resp.getWriter().write(objectMapper.writeValueAsString(transactionsResponseDto));
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         transactionService = TransactionServiceImpl.getInstance();
         objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         super.init(config);
     }
 }

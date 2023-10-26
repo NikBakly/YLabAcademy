@@ -1,5 +1,7 @@
 package org.example.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.aop.annotations.Loggable;
 import org.example.dto.PlayerRequestDto;
 import org.example.dto.PlayerResponseDto;
@@ -21,6 +23,7 @@ import java.util.Optional;
  */
 @Loggable
 public class PlayerServiceImpl implements PlayerService {
+    private static final Logger log = LogManager.getLogger(PlayerServiceImpl.class);
     private static PlayerServiceImpl instance;
 
     private final PlayerRepository playerRepository;
@@ -50,10 +53,11 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public PlayerResponseDto registration(PlayerRequestDto playerRequestDto) throws InvalidInputException, SaveEntityException {
+    public PlayerResponseDto registration(PlayerRequestDto playerRequestDto)
+            throws InvalidInputException, SaveEntityException {
         checkLoginAndPasswordOrThrow(playerRequestDto);
         Player newPlayer = playerRepository.save(playerRequestDto.login(), playerRequestDto.password());
-        System.out.println("Игрок " + playerRequestDto.login() + " успешно зарегистрирован!\n");
+        log.debug("Игрок login={} успешно зарегистрирован.", playerRequestDto.login());
         return PlayerMapper.INSTANCE.toResponseDto(newPlayer);
     }
 
@@ -62,37 +66,44 @@ public class PlayerServiceImpl implements PlayerService {
         checkLoginAndPasswordOrThrow(playerRequestDto);
         Optional<Player> foundPlayer = playerRepository.findByLogin(playerRequestDto.login());
         if (foundPlayer.isPresent() && foundPlayer.get().getPassword().equals(playerRequestDto.password())) {
-            System.out.println("Вы успешно авторизованы!\n");
+            log.debug("Игрок login={} успешно авторизован.", playerRequestDto.login());
             return PlayerMapper.INSTANCE.toResponseDto(foundPlayer.get());
         } else {
-            System.out.println("Вы ошиблись при вводе логина или пароля!\n");
-            throw new InvalidInputException("Вы ошиблись при вводе логина или пароля!");
+            log.warn("Логин или пароль не валидны.");
+            throw new InvalidInputException("Логин или пароль не валидны.");
         }
     }
 
     @Override
-    public PlayerResponseDto debitForPlayer(String loginPlayer, TransactionRequestDto transactionRequestDto) throws RuntimeException {
+    public PlayerResponseDto debitForPlayer(String loginPlayer,
+                                            TransactionRequestDto transactionRequestDto) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
         BigDecimal bigDecimalDebit = BigDecimal.valueOf(transactionRequestDto.size());
         int comparisonResult = balancePlayer.compareTo(bigDecimalDebit);
-        //Когда balancePlayer < bigDecimalDebit
+        //Когда баланс игрока < размер дебита
         if (comparisonResult < 0) {
+            log.warn("У игрока login={} не достаточно средств для дебита.", foundPlayer.getLogin());
             throw new InvalidInputException("У вас нету столько средств на балансе.");
         }
-        transactionService.createTransaction(TransactionMapper.INSTANCE.toEntity(transactionRequestDto));
+        transactionService.createTransaction(TransactionMapper.INSTANCE
+                .toEntity(transactionRequestDto, foundPlayer.getId()));
         foundPlayer.setBalance(balancePlayer.subtract(bigDecimalDebit));
         playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
+        log.info("У игрока login={} успешно прошло действие дебит", loginPlayer);
         return PlayerMapper.INSTANCE.toResponseDto(foundPlayer);
     }
 
     @Override
-    public PlayerResponseDto creditForPlayer(String loginPlayer, TransactionRequestDto transactionRequestDto) throws RuntimeException {
+    public PlayerResponseDto creditForPlayer(String loginPlayer,
+                                             TransactionRequestDto transactionRequestDto) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
-        transactionService.createTransaction(TransactionMapper.INSTANCE.toEntity(transactionRequestDto));
+        transactionService.createTransaction(TransactionMapper.INSTANCE
+                .toEntity(transactionRequestDto, foundPlayer.getId()));
         foundPlayer.setBalance(balancePlayer.add(BigDecimal.valueOf(transactionRequestDto.size())));
         playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
+        log.info("У игрока login={} успешно прошло действие кредит", loginPlayer);
         return PlayerMapper.INSTANCE.toResponseDto(foundPlayer);
     }
 

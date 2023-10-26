@@ -1,4 +1,4 @@
-package org.example.in.servlets;
+package org.example.in.servlets.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,7 +19,6 @@ public class JwtAuthorizationFilter implements Filter {
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException {
-
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         String token = httpRequest.getHeader("Authorization");
 

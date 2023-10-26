@@ -1,9 +1,7 @@
-package org.example.in.servlets;
+package org.example.in.servlets.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
-import org.example.util.DatabaseConnector;
-import org.example.util.LiquibaseManager;
 
 import java.io.IOException;
 
@@ -19,13 +17,4 @@ public class ServletFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        LiquibaseManager
-                .runDatabaseMigrations(
-                        DatabaseConnector.URL,
-                        DatabaseConnector.USERNAME,
-                        DatabaseConnector.PASSWORD);
-        Filter.super.init(filterConfig);
-    }
 }

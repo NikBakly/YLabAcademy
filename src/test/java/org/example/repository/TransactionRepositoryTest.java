@@ -26,16 +26,19 @@ class TransactionRepositoryTest {
             .withPassword(DatabaseConnector.PASSWORD);
 
     static TransactionRepository repository;
+    static PlayerRepository playerRepository;
     static Double sizeTransaction;
     static String loginPlayer;
+    static String passwordPlayer;
     static Long playerId;
     static Long transactionId;
 
     @BeforeAll
     static void init() {
-        playerId = 1L;
+        playerId = 3L;
         sizeTransaction = 120.0;
         loginPlayer = "tester";
+        passwordPlayer = "passTest";
         transactionId = 1L;
     }
 
@@ -50,6 +53,11 @@ class TransactionRepositoryTest {
                 postgresContainer.getJdbcUrl(),
                 postgresContainer.getUsername(),
                 postgresContainer.getPassword());
+        playerRepository = new PlayerRepositoryImpl(
+                postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(),
+                postgresContainer.getPassword()
+        );
     }
 
     @AfterEach
@@ -63,13 +71,15 @@ class TransactionRepositoryTest {
     @Test
     @DisplayName("Удачное создание транзакции типа CREDIT и нахождения ее по идентификатору игрока.")
     void createdTransactionAndFindCreditHistoryTransactions() {
+        playerRepository.save(loginPlayer, passwordPlayer);
         TransactionType transactionType = TransactionType.CREDIT;
         repository.createdTransaction(
                 new Transaction(transactionId, transactionType, sizeTransaction, playerId, Instant.now()));
 
         //Достаем единственную транзакцию из истории пользователя
         TransactionResponseDto foundTransaction =
-                repository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.CREDIT).get(0);
+                repository.findHistoryTransactionsByCreatedTime(playerId, transactionType).get(0);
+
         Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
@@ -82,12 +92,13 @@ class TransactionRepositoryTest {
     @Test
     @DisplayName("Удачное создание транзакции типа DEBIT и нахождения ее по идентификатору игрока.")
     void createdTransactionAndFindDebitHistoryTransactions() {
+        playerRepository.save(loginPlayer, passwordPlayer);
         TransactionType transactionType = TransactionType.DEBIT;
         repository.createdTransaction(
                 new Transaction(transactionId, transactionType, sizeTransaction, playerId, Instant.now()));
         //Достаем единственную транзакцию из истории пользователя
         TransactionResponseDto foundTransaction =
-                repository.findHistoryTransactionsByCreatedTime(playerId, TransactionType.DEBIT).get(0);
+                repository.findHistoryTransactionsByCreatedTime(playerId, transactionType).get(0);
         Assertions.assertThat(foundTransaction.loginPlayer().equals(loginPlayer)
                         && foundTransaction.type().equals(transactionType))
                 .as("Транзакция не правильно создана.")
@@ -100,6 +111,7 @@ class TransactionRepositoryTest {
     @Test
     @DisplayName("Не удачное создание транзакции с не уникальным id.")
     void createdDebitTransactionWhenTransactionSizeIsLargerThanPlayerPersonalFund() {
+        playerRepository.save(loginPlayer, passwordPlayer);
         repository.createdTransaction(
                 new Transaction(transactionId, TransactionType.CREDIT, sizeTransaction, playerId, Instant.now()));
         Throwable thrown = Assertions.catchThrowable(() ->

@@ -59,7 +59,6 @@ public class PlayerTransactionsServlet extends HttpServlet {
      */
     private void checkTransactionDto(TransactionRequestDto transactionRequestDto) throws InvalidInputException {
         if (transactionRequestDto.id() == null ||
-                transactionRequestDto.playerId() == null ||
                 transactionRequestDto.size() == null ||
                 transactionRequestDto.type() == null) {
             throw new InvalidInputException("Один или несколько значений транзакций пустые.");

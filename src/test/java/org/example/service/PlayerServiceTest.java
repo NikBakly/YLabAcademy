@@ -42,7 +42,7 @@ class PlayerServiceTest {
     void setPlayerService() {
         playerId = 1L;
         expectedPlayer = new Player(playerId, loginPlayer, passwordPlayer, 0.0);
-        expectedPlayerResponseDto = new PlayerResponseDto(1L, loginPlayer, BigDecimal.valueOf(0));
+        expectedPlayerResponseDto = new PlayerResponseDto(1L, loginPlayer, BigDecimal.valueOf(0.0));
 
         PlayerRepository playerRepository = Mockito.mock(PlayerRepository.class);
         TransactionService transactionService = Mockito.mock(TransactionService.class);
@@ -146,10 +146,11 @@ class PlayerServiceTest {
     @DisplayName("Не удачная авторизации игрока c неверным паролем.")
     void authorizationPlayerWithWrongPassword() {
         playerService.registration(new PlayerRequestDto(loginPlayer, passwordPlayer));
-        PlayerResponseDto authorizedPlayer = playerService.authorization(new PlayerRequestDto(loginPlayer, passwordPlayer));
-        Assertions.assertThat(authorizedPlayer)
-                .as("Полученный игрок должен быть пустым.")
-                .isNull();
+        Throwable thrown = Assertions.catchThrowable(() ->
+                playerService.authorization(new PlayerRequestDto(loginPlayer, passwordWithError)));
+        Assertions.assertThat(thrown)
+                .as("Должно быть другое исключение")
+                .isInstanceOf(InvalidInputException.class);
     }
 
     /**
@@ -187,7 +188,7 @@ class PlayerServiceTest {
     @DisplayName("Удачное пополнения счета игрока.")
     void creditForPlayer() {
         PlayerResponseDto registeredPlayer = playerService.creditForPlayer(loginPlayer,
-                new TransactionRequestDto(1L, TransactionType.CREDIT, playerId, 0.0));
+                new TransactionRequestDto(1L, TransactionType.CREDIT, creditSize));
         Assertions.assertThat(BigDecimal.valueOf(creditSize))
                 .as("Полученный баланс у игрока не равен ожидаемому.")
                 .isEqualTo(registeredPlayer.balance());
@@ -202,7 +203,7 @@ class PlayerServiceTest {
     void creditForPlayerWhenLoginIsWrong() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.creditForPlayer(loginWithError,
-                        new TransactionRequestDto(1L, TransactionType.CREDIT, playerId, 0.0)));
+                        new TransactionRequestDto(1L, TransactionType.CREDIT, creditSize)));
         String expectedMessageErrorWhenLoginIsWrong = "Игрок не найден.";
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
@@ -217,10 +218,10 @@ class PlayerServiceTest {
     @DisplayName("Удачное снятия со счета игрока.")
     void debitForPlayer() {
         PlayerResponseDto registeredPlayer = playerService.creditForPlayer(loginPlayer,
-                new TransactionRequestDto(1L, TransactionType.DEBIT, playerId, 0.0));
+                new TransactionRequestDto(1L, TransactionType.DEBIT, creditSize));
         registeredPlayer = playerService.debitForPlayer(
                 loginPlayer,
-                new TransactionRequestDto(transactionId + 1, TransactionType.DEBIT, playerId, debitSize));
+                new TransactionRequestDto(transactionId + 1, TransactionType.DEBIT, debitSize));
         Assertions.assertThat(BigDecimal.valueOf(creditSize - debitSize))
                 .as("Полученный баланс у игрока не равен ожидаемому.")
                 .isEqualTo(registeredPlayer.balance());
@@ -234,7 +235,7 @@ class PlayerServiceTest {
     void debitForPlayerWhenLoginIsWrong() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.debitForPlayer(loginWithError,
-                        new TransactionRequestDto(1L, TransactionType.DEBIT, playerId, 0.0)));
+                        new TransactionRequestDto(1L, TransactionType.DEBIT, 0.0)));
         String expectedNotFoundMessageError = "Игрок не найден.";
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
@@ -252,7 +253,7 @@ class PlayerServiceTest {
         String expectedMessageErrorWhenDebitSizeLargerBalancePlayer = "У вас нету столько средств на балансе.";
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.debitForPlayer(loginPlayer,
-                        new TransactionRequestDto(1L, TransactionType.DEBIT, playerId, 0.0)));
+                        new TransactionRequestDto(1L, TransactionType.DEBIT, debitSize)));
         Assertions.assertThat(thrown)
                 .as("Должно быть другое исключение")
                 .isInstanceOf(InvalidInputException.class)

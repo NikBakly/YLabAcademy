@@ -1,7 +1,6 @@
 package org.example.mapper;
 
 import org.example.dto.TransactionRequestDto;
-import org.example.dto.TransactionResponseDto;
 import org.example.model.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +13,7 @@ public interface TransactionMapper {
     TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
     @Mapping(target = "createdTime", expression = "java(Instant.now())")
-    Transaction toEntity(TransactionRequestDto transactionRequestDto);
+    @Mapping(source = "playerId", target = "playerId")
+    Transaction toEntity(TransactionRequestDto transactionRequestDto, Long playerId);
 
-    TransactionResponseDto toResponseDto(Transaction transaction);
 }

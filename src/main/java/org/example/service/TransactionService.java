@@ -25,6 +25,6 @@ public interface TransactionService {
      * @param playerId логин игрока
      * @return список всех транзакций определенного типа по логину игрока и отсортированный по времени
      */
-    List<TransactionResponseDto> getHistoryTransactions(Long playerId, TransactionType transactionType);
+    List<TransactionResponseDto> findHistoryTransactions(Long playerId, TransactionType transactionType);
 
 }
