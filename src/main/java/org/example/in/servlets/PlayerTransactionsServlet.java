@@ -74,4 +74,8 @@ public class PlayerTransactionsServlet extends HttpServlet {
         objectMapper = new ObjectMapper();
         super.init(config);
     }
+
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
+    }
 }

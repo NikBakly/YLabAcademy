@@ -33,14 +33,10 @@ public class PlayerDebitHistoryServlet extends HttpServlet {
                 .setSigningKey(JwtUtil.secret)
                 .parseClaimsJws(jwtToken)
                 .getBody().get("id", Long.class);
-        try {
-            List<TransactionResponseDto> transactionsResponseDto =
-                    transactionService.findHistoryTransactions(playerId, TransactionType.DEBIT);
-            resp.getWriter().write(objectMapper.writeValueAsString(transactionsResponseDto));
-            resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        List<TransactionResponseDto> transactionsResponseDto =
+                transactionService.findHistoryTransactions(playerId, TransactionType.DEBIT);
+        resp.getWriter().write(objectMapper.writeValueAsString(transactionsResponseDto));
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     @Override
@@ -49,5 +45,9 @@ public class PlayerDebitHistoryServlet extends HttpServlet {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         super.init(config);
+    }
+
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 }

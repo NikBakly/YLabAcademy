@@ -17,7 +17,6 @@ import org.example.util.JwtUtil;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,17 +32,13 @@ public class PlayerAuthorizationServlet extends HttpServlet {
         try {
             PlayerRequestDto playerRequestDto = objectMapper.readValue(req.getReader(), PlayerRequestDto.class);
             PlayerResponseDto playerResponseDto = playerService.authorization(playerRequestDto);
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("id", playerResponseDto.id());
-            payload.put("login", playerResponseDto.login());
             String jwtToken = Jwts.builder()
                     .setSubject("authorization")
-                    .setClaims(payload)
+                    .claim("id", playerResponseDto.id())
+                    .claim("login", playerResponseDto.login())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + JwtUtil.oneHourInMilliseconds))
-                    .signWith(
-                            SignatureAlgorithm.HS256,
-                            JwtUtil.secret)
+                    .signWith(SignatureAlgorithm.HS256, JwtUtil.secret)
                     .compact();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(objectMapper.writeValueAsString(Map.of("token", jwtToken)));
@@ -58,5 +53,9 @@ public class PlayerAuthorizationServlet extends HttpServlet {
         playerService = PlayerServiceImpl.getInstance();
         objectMapper = new ObjectMapper();
         super.init(config);
+    }
+
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
     }
 }
