@@ -8,6 +8,9 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
 
+/**
+ * Интерфейс для преобразования объектов Transaction и его DTO
+ */
 @Mapper(imports = Instant.class)
 public interface TransactionMapper {
     TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);

@@ -5,8 +5,11 @@ import jakarta.servlet.annotation.WebFilter;
 
 import java.io.IOException;
 
+/**
+ * Сервлет фильтр для настройки кодировки и содержания при ответе.
+ */
 @WebFilter("/*")
-public class ServletFilter implements Filter {
+public class EncodingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         String encoding = "UTF-8";

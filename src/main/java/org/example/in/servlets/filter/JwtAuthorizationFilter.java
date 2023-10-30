@@ -13,6 +13,9 @@ import org.example.util.JwtUtil;
 
 import java.io.IOException;
 
+/**
+ * Сервлет фильтр для фильтрации приходящих jwt-токенов.
+ */
 @WebFilter("/players/*")
 public class JwtAuthorizationFilter implements Filter {
     @Override

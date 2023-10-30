@@ -7,6 +7,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
+/**
+ * Основной аспект для логирования нужной информации
+ */
 @Aspect
 public class LoggableAspect {
     private static final Logger log = LogManager.getLogger(LoggableAspect.class);
