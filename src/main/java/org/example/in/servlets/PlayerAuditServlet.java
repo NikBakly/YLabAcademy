@@ -40,10 +40,7 @@ public class PlayerAuditServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String jwtToken = req.getHeader("Authorization");
-        Long playerId = Jwts.parser()
-                .setSigningKey(JwtUtil.secret)
-                .parseClaimsJws(jwtToken)
-                .getBody().get("id", Long.class);
+        Long playerId = getPlayerIdByJwtToken(jwtToken);
         List<AuditResponseDto> auditsResponseDto =
                 auditService.findAuditsByLoginPlayer(playerId);
         resp.getWriter().write(objectMapper.writeValueAsString(auditsResponseDto));
@@ -52,5 +49,18 @@ public class PlayerAuditServlet extends HttpServlet {
 
     public void setAuditService(AuditService auditService) {
         this.auditService = auditService;
+    }
+
+    /**
+     * Метод для получения id игрока из jwt-токена
+     *
+     * @param jwtToken jwt-токен игрока при запросе
+     * @return id игрока
+     */
+    private Long getPlayerIdByJwtToken(String jwtToken) {
+        return Jwts.parser()
+                .setSigningKey(JwtUtil.secret)
+                .parseClaimsJws(jwtToken)
+                .getBody().get("id", Long.class);
     }
 }

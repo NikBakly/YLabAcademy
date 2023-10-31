@@ -42,10 +42,7 @@ public class PlayerTransactionsServlet extends HttpServlet {
             checkTransactionDto(transactionRequestDto);
 
             String jwtToken = req.getHeader("Authorization");
-            String loginPlayer = Jwts.parser()
-                    .setSigningKey(JwtUtil.secret)
-                    .parseClaimsJws(jwtToken)
-                    .getBody().get("login", String.class);
+            String loginPlayer = getLoginPlayerByJwtToken(jwtToken);
             PlayerResponseDto playerResponseDto =
                     transactionRequestDto.type().equals(TransactionType.CREDIT) ?
                             playerService.creditForPlayer(loginPlayer, transactionRequestDto) :
@@ -84,5 +81,18 @@ public class PlayerTransactionsServlet extends HttpServlet {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+    }
+
+    /**
+     * Метод для получения логина игрока из jwt-токена
+     *
+     * @param jwtToken jwt-токен игрока при запросе
+     * @return логин игрока
+     */
+    private String getLoginPlayerByJwtToken(String jwtToken) {
+        return Jwts.parser()
+                .setSigningKey(JwtUtil.secret)
+                .parseClaimsJws(jwtToken)
+                .getBody().get("login", String.class);
     }
 }

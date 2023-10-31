@@ -39,14 +39,7 @@ public class PlayerAuthorizationServlet extends HttpServlet {
         try {
             PlayerRequestDto playerRequestDto = objectMapper.readValue(req.getReader(), PlayerRequestDto.class);
             PlayerResponseDto playerResponseDto = playerService.authorization(playerRequestDto);
-            String jwtToken = Jwts.builder()
-                    .setSubject("authorization")
-                    .claim("id", playerResponseDto.id())
-                    .claim("login", playerResponseDto.login())
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + JwtUtil.oneHourInMilliseconds))
-                    .signWith(SignatureAlgorithm.HS256, JwtUtil.secret)
-                    .compact();
+            String jwtToken = getJwtToken(playerResponseDto);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(objectMapper.writeValueAsString(Map.of("token", jwtToken)));
         } catch (Exception e) {
@@ -64,5 +57,16 @@ public class PlayerAuthorizationServlet extends HttpServlet {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+    }
+
+    private static String getJwtToken(PlayerResponseDto playerResponseDto) {
+        return Jwts.builder()
+                .setSubject("authorization")
+                .claim("id", playerResponseDto.id())
+                .claim("login", playerResponseDto.login())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + JwtUtil.oneHourInMilliseconds))
+                .signWith(SignatureAlgorithm.HS256, JwtUtil.secret)
+                .compact();
     }
 }
