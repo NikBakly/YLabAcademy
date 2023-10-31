@@ -1,5 +1,6 @@
 package org.example.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.example.util.AuditType;
 
 import java.time.Instant;
@@ -13,5 +14,6 @@ import java.time.Instant;
  */
 public record AuditResponseDto(AuditType type,
                                Long playerId,
+                               @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
                                Instant createdTime) {
 }
