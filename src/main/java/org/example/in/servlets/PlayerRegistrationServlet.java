@@ -30,6 +30,13 @@ public class PlayerRegistrationServlet extends HttpServlet {
         objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Метод для регистрации игрока
+     *
+     * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     * @throws IOException если произошла ошибка во время ответа
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {

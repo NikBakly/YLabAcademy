@@ -27,6 +27,13 @@ public class PlayerTransactionsServlet extends HttpServlet {
     private PlayerService playerService;
     private ObjectMapper objectMapper;
 
+    /**
+     * Метод для создания транзакции типа дебит или кредит
+     *
+     * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     * @throws IOException если во время ответа произошла ошибка
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {

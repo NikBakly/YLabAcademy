@@ -26,6 +26,13 @@ public class PlayerCreditHistoryServlet extends HttpServlet {
     private TransactionService transactionService;
     private ObjectMapper objectMapper;
 
+    /**
+     * Метод для получения истории транзакций типа кредит
+     *
+     * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     * @throws IOException если произошла ошибка во время ответа
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String jwtToken = req.getHeader("Authorization");
