@@ -29,7 +29,7 @@
         <jakarta.servlet.version>6.0.0</jakarta.servlet.version>
         <lombok.version>1.18.30</lombok.version>
         <jackson-datatype-jsr310.version>2.15.3</jackson-datatype-jsr310.version>
-        <aspectj.version>1.9.20.1</aspectj.version>
+        <aspectj.version>1.9.19</aspectj.version>
         <plugin.war.version>3.3.1</plugin.war.version>
         <plugin.aspectj.version>1.14.0</plugin.aspectj.version>
         <jjwt.version>0.9.1</jjwt.version>
@@ -155,6 +155,12 @@
                     <verbose>true</verbose>
                     <Xlint>ignore</Xlint>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <weaveDirectories>
+                        <weaveDirectory>src/main/java</weaveDirectory>
+                    </weaveDirectories>
+                    <excludes>
+                        <exclude>**/org/example/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

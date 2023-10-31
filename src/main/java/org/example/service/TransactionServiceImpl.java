@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.aop.annotations.Loggable;
+import org.example.aop.annotations.LoggableService;
 import org.example.dto.TransactionResponseDto;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Класс реализующий бизнес-логику для сущности Transaction.
  */
-@Loggable
+@LoggableService
 public class TransactionServiceImpl implements TransactionService {
     private static final Logger log = LogManager.getLogger(TransactionServiceImpl.class);
     private static TransactionServiceImpl instance;

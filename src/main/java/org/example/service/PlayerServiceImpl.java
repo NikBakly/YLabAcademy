@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.aop.annotations.Loggable;
+import org.example.aop.annotations.LoggableService;
 import org.example.dto.PlayerRequestDto;
 import org.example.dto.PlayerResponseDto;
 import org.example.dto.TransactionRequestDto;
@@ -18,10 +18,7 @@ import org.example.repository.PlayerRepositoryImpl;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-/**
- * Класс реализующий бизнес-логику для сущности Player.
- */
-@Loggable
+@LoggableService
 public class PlayerServiceImpl implements PlayerService {
     private static final Logger log = LogManager.getLogger(PlayerServiceImpl.class);
     private static PlayerServiceImpl instance;

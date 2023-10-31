@@ -1,5 +1,7 @@
 package org.example.repository;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.dto.TransactionResponseDto;
 import org.example.exception.SaveEntityException;
 import org.example.model.Transaction;
@@ -10,7 +12,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс отвечающий за взаимодействие сущности Transaction с БД
+ */
 public class TransactionRepositoryImpl implements TransactionRepository {
+    private static final Logger log = LogManager.getLogger(TransactionRepositoryImpl.class);
     private static final String INSERT_SQL =
             "INSERT INTO wallet.transactions (id, type, size, player_id, created_time) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_SQL =
@@ -47,7 +53,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             preparedStatement.setTimestamp(5, Timestamp.from(newTransaction.createdTime()));
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted == 0) {
-                System.err.printf("Транзакция id=%d не сохранилась.%n", newTransaction.id());
+                log.warn("Транзакция id={} не сохранилась.", newTransaction.id());
             }
         } catch (SQLException e) {
             throw new SaveEntityException(e.getMessage());
@@ -78,7 +84,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 ));
             }
         } catch (SQLException e) {
-            System.err.printf(e.getMessage());
+            log.warn(e.getMessage());
         }
 
         return foundTransactions;

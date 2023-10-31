@@ -6,6 +6,8 @@ import liquibase.command.core.helpers.DbUrlConnectionCommandStep;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,6 +18,8 @@ import java.util.Properties;
  * Класс управляет миграциями с использованием Liquibase
  */
 public class LiquibaseManager {
+    private static final Logger log = LogManager.getLogger(LiquibaseManager.class);
+
     /**
      * Метод запускает миграции базы данных
      */
@@ -43,7 +47,7 @@ public class LiquibaseManager {
 
             connection.close();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 
@@ -59,7 +63,7 @@ public class LiquibaseManager {
             statement.executeUpdate(createSchemaSQL);
             statement.close();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 
