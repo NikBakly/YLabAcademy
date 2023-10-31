@@ -178,13 +178,11 @@ public class LoggableServiceAspect {
         if (auditType == null) {
             return null;
         }
-        String result;
+        String result = null;
         if (auditType.equals(AuditType.REGISTRATION) ||
                 auditType.equals(AuditType.AUTHORIZATION)) {
             PlayerRequestDto playerRequestDto = (PlayerRequestDto) args[0];
             result = playerRequestDto.login();
-        } else {
-            result = (String) args[0];
         }
         return result;
     }
