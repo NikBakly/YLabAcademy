@@ -36,7 +36,7 @@ class PlayerAuthorizationServletTest {
 
     @Test
     @DisplayName("Успешная авторизация игрока")
-    void authorizationPlayer() throws IOException {
+    void testAuthorizationPlayer() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -59,7 +59,7 @@ class PlayerAuthorizationServletTest {
 
     @Test
     @DisplayName("Не успешная авторизация игрока")
-    void authorizationPlayerWithError() throws IOException {
+    void testAuthorizationPlayerWithError() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -79,6 +79,4 @@ class PlayerAuthorizationServletTest {
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         verify(response).getWriter();
     }
-
-
 }

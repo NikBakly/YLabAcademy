@@ -54,7 +54,7 @@ class PlayerDebitHistoryServletTest {
 
     @Test
     @DisplayName("Успешно нахождения всех историй типа дебит")
-    void creditHistoryTransactions() throws IOException {
+    void testCreditHistoryTransactions() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 

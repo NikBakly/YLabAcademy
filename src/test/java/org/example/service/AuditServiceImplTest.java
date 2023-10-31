@@ -41,7 +41,7 @@ class AuditServiceImplTest {
      */
     @Test
     @DisplayName("Проверка шаблона проектирования Singleton.")
-    void getInstance() {
+    void testGetInstance() {
         AuditServiceImpl first = AuditServiceImpl.getInstance();
         AuditServiceImpl secondPointer = AuditServiceImpl.getInstance();
         Assertions.assertThat(first)
@@ -54,7 +54,7 @@ class AuditServiceImplTest {
      */
     @Test
     @DisplayName("Удачное создание и нахождение аудита по идентификатору игрока")
-    void createAndFindAuditByLoginPlayer() {
+    void testCreateAndFindAuditByLoginPlayer() {
         AuditType auditType = AuditType.REGISTRATION;
         service.createAudit(auditType, playerId);
         AuditResponseDto foundAudit = service.findAuditsByLoginPlayer(playerId).get(0);

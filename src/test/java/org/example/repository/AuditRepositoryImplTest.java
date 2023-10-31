@@ -52,7 +52,7 @@ class AuditRepositoryImplTest {
      */
     @Test
     @DisplayName("Удачное создание аудитов и их нахождения по идентификатору игрока")
-    void addAndFindAuditsByLoginPlayer() {
+    void testAddAndFindAuditsByLoginPlayer() {
         Long playerId = 1L;
         // заполняем различными действиями пользователя
         repository.createAudit(AuditType.REGISTRATION, playerId);

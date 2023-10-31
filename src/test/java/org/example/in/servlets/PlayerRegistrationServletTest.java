@@ -37,7 +37,7 @@ class PlayerRegistrationServletTest {
 
     @Test
     @DisplayName("Успешная регистрация игрока")
-    public void registrationPlayer() throws Exception {
+    public void testRegistrationPlayer() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -60,7 +60,7 @@ class PlayerRegistrationServletTest {
 
     @Test
     @DisplayName("Не успешная регистрация игрока")
-    public void registrationPlayerWithError() throws Exception {
+    public void testRegistrationPlayerWithError() throws Exception {
         // Создайте фейковый запрос и ответ
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);

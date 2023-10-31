@@ -57,7 +57,7 @@ class PlayerTransactionsServletTest {
 
     @Test
     @DisplayName("Успешное создания транзакции типа кредит")
-    public void creditTransaction() throws Exception {
+    public void testCreditTransaction() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -81,7 +81,7 @@ class PlayerTransactionsServletTest {
 
     @Test
     @DisplayName("Успешное создания транзакции типа дебит")
-    public void debitTransaction() throws Exception {
+    public void testDebitTransaction() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -105,7 +105,7 @@ class PlayerTransactionsServletTest {
 
     @Test
     @DisplayName("Не успешное создания транзакции типа дебит при size = null")
-    public void debitTransactionWhenSizeIsNull() throws Exception {
+    public void testDebitTransactionWhenSizeIsNull() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -128,7 +128,7 @@ class PlayerTransactionsServletTest {
 
     @Test
     @DisplayName("Не успешное создания транзакции типа дебит при size < 0")
-    public void debitTransactionWhenSizeLessThanZero() throws Exception {
+    public void testDebitTransactionWhenSizeLessThanZero() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 

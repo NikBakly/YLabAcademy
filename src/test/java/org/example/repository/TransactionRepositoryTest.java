@@ -70,7 +70,7 @@ class TransactionRepositoryTest {
      */
     @Test
     @DisplayName("Удачное создание транзакции типа CREDIT и нахождения ее по идентификатору игрока.")
-    void createdTransactionAndFindCreditHistoryTransactions() {
+    void testCreatedTransactionAndFindCreditHistoryTransactions() {
         playerRepository.save(loginPlayer, passwordPlayer);
         TransactionType transactionType = TransactionType.CREDIT;
         repository.createdTransaction(
@@ -91,7 +91,7 @@ class TransactionRepositoryTest {
      */
     @Test
     @DisplayName("Удачное создание транзакции типа DEBIT и нахождения ее по идентификатору игрока.")
-    void createdTransactionAndFindDebitHistoryTransactions() {
+    void testCreatedTransactionAndFindDebitHistoryTransactions() {
         playerRepository.save(loginPlayer, passwordPlayer);
         TransactionType transactionType = TransactionType.DEBIT;
         repository.createdTransaction(
@@ -110,7 +110,7 @@ class TransactionRepositoryTest {
      */
     @Test
     @DisplayName("Не удачное создание транзакции с не уникальным id.")
-    void createdDebitTransactionWhenTransactionSizeIsLargerThanPlayerPersonalFund() {
+    void testCreatedDebitTransactionWhenTransactionSizeIsLargerThanPlayerPersonalFund() {
         playerRepository.save(loginPlayer, passwordPlayer);
         repository.createdTransaction(
                 new Transaction(transactionId, TransactionType.CREDIT, sizeTransaction, playerId, Instant.now()));

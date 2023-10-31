@@ -61,7 +61,7 @@ class PlayerRepositoryTest {
      */
     @Test
     @DisplayName("Удачное создание и нахождения игрока по его логину")
-    void saveAndFindPlayerByLogin() {
+    void testSaveAndFindPlayerByLogin() {
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Player foundPlayer = repository.findByLogin(expectedLoginPlayer).get();
         Assertions.assertThat(expectedLoginPlayer)
@@ -82,7 +82,7 @@ class PlayerRepositoryTest {
      */
     @Test
     @DisplayName("Не удачное создания игрока с не уникальным логином")
-    void savePlayerWhenLoginNotUnique() {
+    void testSavePlayerWhenLoginNotUnique() {
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Throwable thrown = Assertions.catchThrowable(() ->
                 repository.save(expectedLoginPlayer, expectedPasswordPlayer));
@@ -93,7 +93,7 @@ class PlayerRepositoryTest {
 
     @Test
     @DisplayName("Удачное обновление баланса у пользователя")
-    void updateBalanceByLogin() {
+    void testUpdateBalanceByLogin() {
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Optional<Player> foundPlayer = repository.findByLogin(expectedLoginPlayer);
         if (foundPlayer.isPresent()) {
@@ -117,7 +117,7 @@ class PlayerRepositoryTest {
 
     @Test
     @DisplayName("Не удачное нахождение игрока из-за неверного логина")
-    void findPlayerByLogin() {
+    void testFindPlayerByLogin() {
         Optional<Player> foundPlayer = repository.findByLogin(expectedLoginPlayer);
         Assertions.assertThat(foundPlayer.isEmpty())
                 .as("Найденная сущность должна быть пустым")

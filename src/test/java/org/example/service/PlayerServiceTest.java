@@ -78,7 +78,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Проверка шаблона проектирования Singleton.")
-    void getInstance() {
+    void testGetInstance() {
         PlayerServiceImpl firstPointer = PlayerServiceImpl.getInstance();
         PlayerServiceImpl secondPointer = PlayerServiceImpl.getInstance();
         Assertions.assertThat(firstPointer)
@@ -91,7 +91,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачная регистрации при пустом поле login.")
-    void registrationPlayerWhenLoginIsBlank() {
+    void testRegistrationPlayerWhenLoginIsBlank() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.registration(new PlayerRequestDto(blank, passwordPlayer)));
         Assertions.assertThat(thrown)
@@ -105,7 +105,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачная регистрации при пустом поле password.")
-    void registrationPlayerWhenPasswordIsBlank() {
+    void testRegistrationPlayerWhenPasswordIsBlank() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.registration(new PlayerRequestDto(loginPlayer, blank)));
         Assertions.assertThat(thrown)
@@ -119,7 +119,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Удачная регистрации игрока.")
-    void registrationPlayer() {
+    void testRegistrationPlayer() {
         PlayerResponseDto registeredPlayer = playerService.registration(new PlayerRequestDto(loginPlayer, passwordPlayer));
         Assertions.assertThat(expectedPlayerResponseDto)
                 .as("Полученный игрок не совпадает с ожидаемым игроком.")
@@ -131,7 +131,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Удачная авторизации игрока.")
-    void authorizationPlayer() {
+    void testAuthorizationPlayer() {
         playerService.registration(new PlayerRequestDto(loginPlayer, passwordPlayer));
         PlayerResponseDto authorizedPlayer = playerService.authorization(new PlayerRequestDto(loginPlayer, passwordPlayer));
         Assertions.assertThat(expectedPlayerResponseDto)
@@ -144,7 +144,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачная авторизации игрока c неверным паролем.")
-    void authorizationPlayerWithWrongPassword() {
+    void testAuthorizationPlayerWithWrongPassword() {
         playerService.registration(new PlayerRequestDto(loginPlayer, passwordPlayer));
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.authorization(new PlayerRequestDto(loginPlayer, passwordWithError)));
@@ -158,7 +158,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачная авторизации игрока с пустым полем login.")
-    void authorizationPlayerWithLoginIsBlank() {
+    void testAuthorizationPlayerWithLoginIsBlank() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.authorization(new PlayerRequestDto(blank, passwordPlayer)));
         Assertions.assertThat(thrown)
@@ -172,7 +172,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачная авторизации игрока с пустым полем password.")
-    void authorizationPlayerWithPasswordIsBlank() {
+    void testAuthorizationPlayerWithPasswordIsBlank() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.authorization(new PlayerRequestDto(loginPlayer, blank)));
         Assertions.assertThat(thrown)
@@ -186,7 +186,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Удачное пополнения счета игрока.")
-    void creditForPlayer() {
+    void testCreditForPlayer() {
         PlayerResponseDto registeredPlayer = playerService.creditForPlayer(loginPlayer,
                 new TransactionRequestDto(1L, TransactionType.CREDIT, creditSize));
         Assertions.assertThat(BigDecimal.valueOf(creditSize))
@@ -200,7 +200,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачное пополнения счета игрока не существующего игрока.")
-    void creditForPlayerWhenLoginIsWrong() {
+    void testCreditForPlayerWhenLoginIsWrong() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.creditForPlayer(loginWithError,
                         new TransactionRequestDto(1L, TransactionType.CREDIT, creditSize)));
@@ -216,7 +216,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Удачное снятия со счета игрока.")
-    void debitForPlayer() {
+    void testDebitForPlayer() {
         PlayerResponseDto registeredPlayer = playerService.creditForPlayer(loginPlayer,
                 new TransactionRequestDto(1L, TransactionType.DEBIT, creditSize));
         registeredPlayer = playerService.debitForPlayer(
@@ -232,7 +232,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачное снятия со счета у не существующего игрока.")
-    void debitForPlayerWhenLoginIsWrong() {
+    void testDebitForPlayerWhenLoginIsWrong() {
         Throwable thrown = Assertions.catchThrowable(() ->
                 playerService.debitForPlayer(loginWithError,
                         new TransactionRequestDto(1L, TransactionType.DEBIT, 0.0)));
@@ -248,7 +248,7 @@ class PlayerServiceTest {
      */
     @Test
     @DisplayName("Не удачное снятия со счета игрока, когда размер дебета превышает размер баланса игрока.")
-    void debitForPlayerWhenDebitSizeLargerBalancePlayer() {
+    void testDebitForPlayerWhenDebitSizeLargerBalancePlayer() {
         playerService.registration(new PlayerRequestDto(loginPlayer, passwordPlayer));
         String expectedMessageErrorWhenDebitSizeLargerBalancePlayer = "У вас нету столько средств на балансе.";
         Throwable thrown = Assertions.catchThrowable(() ->
