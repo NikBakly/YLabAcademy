@@ -1,7 +1,8 @@
 package org.example.service;
 
+import org.example.domain.dto.TransactionResponseDto;
+import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
-import org.example.model.Transaction;
 import org.example.util.TransactionType;
 
 import java.util.List;
@@ -24,6 +25,6 @@ public interface TransactionService {
      * @param playerId логин игрока
      * @return список всех транзакций определенного типа по логину игрока и отсортированный по времени
      */
-    List<Transaction> getHistoryTransactions(Long playerId, TransactionType transactionType);
+    List<TransactionResponseDto> findHistoryTransactions(Long playerId, TransactionType transactionType);
 
 }

@@ -1,7 +1,7 @@
 package org.example.repository;
 
+import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
-import org.example.model.Player;
 
 import java.util.Optional;
 

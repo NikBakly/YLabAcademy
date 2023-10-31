@@ -1,7 +1,7 @@
 package org.example.repository;
 
 import org.assertj.core.api.Assertions;
-import org.example.model.Audit;
+import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.example.util.DatabaseConnector;
 import org.example.util.LiquibaseManager;
@@ -19,7 +19,7 @@ import java.util.List;
  * Класс для тестирования AuditInMemoryRepository
  */
 @Testcontainers
-class AuditRepositoryTest {
+class AuditRepositoryImplTest {
     @Container
     private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:13.3")
             .withDatabaseName(DatabaseConnector.DATABASE_NAME)
@@ -55,18 +55,15 @@ class AuditRepositoryTest {
     void addAndFindAuditsByLoginPlayer() {
         Long playerId = 1L;
         // заполняем различными действиями пользователя
-        repository.addAudit(AuditType.REGISTRATION, playerId);
-        repository.addAudit(AuditType.BALANCE_REQUEST, playerId);
-        repository.addAudit(AuditType.EXIT, playerId);
-        repository.addAudit(AuditType.AUTHORIZATION, playerId);
-        repository.addAudit(AuditType.CREDIT, playerId);
-        repository.addAudit(AuditType.DEBIT, playerId);
-        repository.addAudit(AuditType.REQUEST_DEBIT_HISTORY, playerId);
-        repository.addAudit(AuditType.REQUEST_CREDIT_HISTORY, playerId);
-        repository.addAudit(AuditType.ERROR_ENTERING_COMMAND, playerId);
+        repository.createAudit(AuditType.REGISTRATION, playerId);
+        repository.createAudit(AuditType.AUTHORIZATION, playerId);
+        repository.createAudit(AuditType.CREDIT, playerId);
+        repository.createAudit(AuditType.DEBIT, playerId);
+        repository.createAudit(AuditType.REQUEST_DEBIT_HISTORY, playerId);
+        repository.createAudit(AuditType.REQUEST_CREDIT_HISTORY, playerId);
 
         List<Audit> foundedAudits = repository.findAuditsByPlayerIdByCreatedTime(playerId);
-        int expectedAuditsSize = 9;
+        int expectedAuditsSize = 6;
 
         Assertions.assertThat(expectedAuditsSize)
                 .as("Размеры полученных аудитов не совпадает с ожидаемым.")
@@ -77,29 +74,25 @@ class AuditRepositoryTest {
         Assertions.assertThat(AuditType.REGISTRATION)
                 .as("Должна быть регистрация.")
                 .isEqualTo(foundedAudits.get(nextId++).type());
-        Assertions.assertThat(AuditType.BALANCE_REQUEST)
-                .as("Должно быть действие запрос средств.")
-                .isEqualTo(foundedAudits.get(nextId++).type());
-        Assertions.assertThat(AuditType.EXIT)
-                .as("Должно быть действие выход.")
-                .isEqualTo(foundedAudits.get(nextId++).type());
+
         Assertions.assertThat(AuditType.AUTHORIZATION)
                 .as("Должна быть авторизация.")
                 .isEqualTo(foundedAudits.get(nextId++).type());
+
         Assertions.assertThat(AuditType.CREDIT)
                 .as("Должно быть действие пополнение средств.")
                 .isEqualTo(foundedAudits.get(nextId++).type());
+
         Assertions.assertThat(AuditType.DEBIT)
                 .as("Должно быть действие снятие средств.")
                 .isEqualTo(foundedAudits.get(nextId++).type());
+
         Assertions.assertThat(AuditType.REQUEST_DEBIT_HISTORY)
                 .as("Должно быть действие запрос истории снятия средств.")
                 .isEqualTo(foundedAudits.get(nextId++).type());
+
         Assertions.assertThat(AuditType.REQUEST_CREDIT_HISTORY)
                 .as("Должно быть действие запрос истории пополнения средств.")
-                .isEqualTo(foundedAudits.get(nextId++).type());
-        Assertions.assertThat(AuditType.ERROR_ENTERING_COMMAND)
-                .as("Должно быть действие неправильного ввода команды.")
                 .isEqualTo(foundedAudits.get(nextId).type());
     }
 

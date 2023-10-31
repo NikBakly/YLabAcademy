@@ -1,7 +1,11 @@
 package org.example.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.aop.annotations.LoggableService;
+import org.example.domain.dto.TransactionResponseDto;
+import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
-import org.example.model.Transaction;
 import org.example.repository.TransactionRepository;
 import org.example.repository.TransactionRepositoryImpl;
 import org.example.util.TransactionType;
@@ -11,7 +15,9 @@ import java.util.List;
 /**
  * Класс реализующий бизнес-логику для сущности Transaction.
  */
+@LoggableService
 public class TransactionServiceImpl implements TransactionService {
+    private static final Logger log = LogManager.getLogger(TransactionServiceImpl.class);
     private static TransactionServiceImpl instance;
 
     private final TransactionRepository transactionRepository;
@@ -39,11 +45,14 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void createTransaction(Transaction newTransaction) throws SaveEntityException {
         transactionRepository.createdTransaction(newTransaction);
+        log.info("Транзакция с id={} успешно создана.", newTransaction.id());
     }
 
     @Override
-    public List<Transaction> getHistoryTransactions(Long playerId, TransactionType transactionType) {
-        return transactionRepository.findHistoryTransactionsByCreatedTime(playerId, transactionType);
+    public List<TransactionResponseDto> findHistoryTransactions(Long playerId, TransactionType transactionType) {
+        List<TransactionResponseDto> foundHistoryTransactions =
+                transactionRepository.findHistoryTransactionsByCreatedTime(playerId, transactionType);
+        log.info("Истории транзакций успешно найдены.");
+        return foundHistoryTransactions;
     }
-
 }

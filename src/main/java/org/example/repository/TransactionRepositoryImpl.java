@@ -1,7 +1,10 @@
 package org.example.repository;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.domain.dto.TransactionResponseDto;
+import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
-import org.example.model.Transaction;
 import org.example.util.DatabaseConnector;
 import org.example.util.TransactionType;
 
@@ -9,11 +12,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс отвечающий за взаимодействие сущности Transaction с БД
+ */
 public class TransactionRepositoryImpl implements TransactionRepository {
+    private static final Logger log = LogManager.getLogger(TransactionRepositoryImpl.class);
     private static final String INSERT_SQL =
             "INSERT INTO wallet.transactions (id, type, size, player_id, created_time) VALUES (?, ?, ?, ?, ?)";
-    private static final String SELECT_CREDIT_SQL =
-            "SELECT * FROM wallet.transactions WHERE player_id = ? AND type = ? ORDER BY created_time";
+    private static final String SELECT_SQL =
+            "SELECT t.id, t.type, t.size, t.created_time, p.login " +
+                    "FROM wallet.transactions AS t " +
+                    "JOIN wallet.players AS p ON t.player_id = p.id " +
+                    "WHERE player_id = ? AND type = ? " +
+                    "ORDER BY created_time";
 
     private final String jdbcUrl;
     private final String jdbcUsername;
@@ -42,7 +53,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             preparedStatement.setTimestamp(5, Timestamp.from(newTransaction.createdTime()));
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted == 0) {
-                System.err.printf("Транзакция id=%d не сохранилась.%n", newTransaction.id());
+                log.warn("Транзакция id={} не сохранилась.", newTransaction.id());
             }
         } catch (SQLException e) {
             throw new SaveEntityException(e.getMessage());
@@ -50,10 +61,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType) {
-        List<Transaction> foundTransactions = new ArrayList<>();
+    public List<TransactionResponseDto> findHistoryTransactionsByCreatedTime(Long playerId, TransactionType transactionType) {
+        List<TransactionResponseDto> foundTransactions = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_CREDIT_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             preparedStatement.setLong(1, playerId);
             preparedStatement.setString(2, transactionType.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -62,18 +73,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TransactionType type = resultSet.getString("type")
                         .transform(TransactionType::valueOf);
                 Double transactionSize = resultSet.getDouble("size");
-                Long transactionPlayerId = resultSet.getLong("player_id");
+                String transactionLoginPlayer = resultSet.getString("login");
                 Timestamp transactionCreatedTime = resultSet.getTimestamp("created_time");
-                foundTransactions.add(new Transaction(
+                foundTransactions.add(new TransactionResponseDto(
                         transactionId,
                         type,
                         transactionSize,
-                        transactionPlayerId,
+                        transactionLoginPlayer,
                         transactionCreatedTime.toInstant()
                 ));
             }
         } catch (SQLException e) {
-            System.err.printf(e.getMessage());
+            log.warn(e.getMessage());
         }
 
         return foundTransactions;

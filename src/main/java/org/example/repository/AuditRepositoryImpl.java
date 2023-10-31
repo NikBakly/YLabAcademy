@@ -1,6 +1,8 @@
 package org.example.repository;
 
-import org.example.model.Audit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.example.util.DatabaseConnector;
 
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuditRepositoryImpl implements AuditRepository {
+    private static final Logger log = LogManager.getLogger(AuditRepositoryImpl.class);
     private static final String INSERT_SQL =
             "INSERT INTO wallet.audits (type, player_id, created_time) VALUES (?, ?, ?)";
     private static final String SELECT_SQL =
@@ -42,7 +45,7 @@ public class AuditRepositoryImpl implements AuditRepository {
     }
 
     @Override
-    public void addAudit(AuditType auditType, Long playerId) {
+    public void createAudit(AuditType auditType, Long playerId) {
         try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setString(1, auditType.toString());
@@ -50,10 +53,10 @@ public class AuditRepositoryImpl implements AuditRepository {
             preparedStatement.setTimestamp(3, Timestamp.from(Instant.now()));
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted == 0) {
-                System.err.printf("У игрока с login=%s не сохранился аудит.%n", playerId);
+                log.warn("У игрока с login={} не сохранился аудит.", playerId);
             }
         } catch (SQLException e) {
-            System.err.printf(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 

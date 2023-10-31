@@ -1,6 +1,6 @@
 package org.example.repository;
 
-import org.example.model.Audit;
+import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public interface AuditRepository {
      * @param auditType тип
      * @param playerId  идентификатор игрока
      */
-    void addAudit(AuditType auditType, Long playerId);
+    void createAudit(AuditType auditType, Long playerId);
 
     /**
      * Метод для нахождения всех аудитов игрока.

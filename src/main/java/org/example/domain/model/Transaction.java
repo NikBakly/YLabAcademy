@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.domain.model;
 
 import org.example.util.TransactionType;
 
@@ -11,7 +11,7 @@ import java.time.Instant;
  * @param type        тип транзакции
  * @param size        размер транзакции
  * @param playerId    идентификатор игрока, который был инициатором создания транзакции
- * @param createdTime
+ * @param createdTime время создания транзакции
  */
 public record Transaction(Long id,
                           TransactionType type,

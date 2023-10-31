@@ -7,7 +7,7 @@
     <groupId>org.example</groupId>
     <artifactId>YLabAcademy</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>YLabAcademy</name>
 
@@ -25,6 +25,15 @@
         <liquibase-core.version>4.24.0</liquibase-core.version>
         <testcontainers.postgresql.version>1.18.3</testcontainers.postgresql.version>
         <testcontainers.junit-jupiter.version>1.19.1</testcontainers.junit-jupiter.version>
+        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
+        <jakarta.servlet.version>6.0.0</jakarta.servlet.version>
+        <lombok.version>1.18.30</lombok.version>
+        <jackson-datatype-jsr310.version>2.15.3</jackson-datatype-jsr310.version>
+        <aspectj.version>1.9.19</aspectj.version>
+        <plugin.war.version>3.3.1</plugin.war.version>
+        <plugin.aspectj.version>1.14.0</plugin.aspectj.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <log4j2.version>2.21.1</log4j2.version>
     </properties>
 
     <dependencies>
@@ -74,9 +83,42 @@
             <version>${testcontainers.junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
-
-
-
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-datatype-jsr310.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -87,22 +129,46 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${plugin.war.version}</version>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>${plugin.aspectj.version}</version>
+                <configuration>
+                    <complianceLevel>16</complianceLevel>
+                    <source>16</source>
+                    <target>16</target>
+                    <showWeaveInfo>true</showWeaveInfo>
+                    <verbose>true</verbose>
+                    <Xlint>ignore</Xlint>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <weaveDirectories>
+                        <weaveDirectory>src/main/java</weaveDirectory>
+                    </weaveDirectories>
+                    <excludes>
+                        <exclude>**/org/example/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>java</goal>
+                            <goal>compile</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <mainClass>org.example.App</mainClass>
-                </configuration>
             </plugin>
         </plugins>
     </build>

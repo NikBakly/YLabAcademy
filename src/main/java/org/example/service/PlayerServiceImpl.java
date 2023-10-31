@@ -1,22 +1,26 @@
 package org.example.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.aop.annotations.LoggableService;
+import org.example.domain.dto.PlayerRequestDto;
+import org.example.domain.dto.PlayerResponseDto;
+import org.example.domain.dto.TransactionRequestDto;
+import org.example.domain.model.Player;
 import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
 import org.example.exception.SaveEntityException;
-import org.example.model.Player;
-import org.example.model.Transaction;
+import org.example.mapper.PlayerMapper;
+import org.example.mapper.TransactionMapper;
 import org.example.repository.PlayerRepository;
 import org.example.repository.PlayerRepositoryImpl;
-import org.example.util.TransactionType;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Optional;
 
-/**
- * Класс реализующий бизнес-логику для сущности Player.
- */
+@LoggableService
 public class PlayerServiceImpl implements PlayerService {
+    private static final Logger log = LogManager.getLogger(PlayerServiceImpl.class);
     private static PlayerServiceImpl instance;
 
     private final PlayerRepository playerRepository;
@@ -46,56 +50,67 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player registration(String login, String password) throws InvalidInputException, SaveEntityException {
-        checkLoginAndPasswordOrThrow(login, password);
-        Player newPlayer = playerRepository.save(login, password);
-        System.out.println("Игрок " + login + " успешно зарегистрирован!\n");
-        return newPlayer;
+    public PlayerResponseDto registration(PlayerRequestDto playerRequestDto)
+            throws InvalidInputException, SaveEntityException {
+        checkLoginAndPasswordOrThrow(playerRequestDto);
+        Player newPlayer = playerRepository.save(playerRequestDto.login(), playerRequestDto.password());
+        log.debug("Игрок login={} успешно зарегистрирован.", playerRequestDto.login());
+        return PlayerMapper.INSTANCE.toResponseDto(newPlayer);
     }
 
     @Override
-    public Player authorization(String login, String password) throws InvalidInputException {
-        checkLoginAndPasswordOrThrow(login, password);
-        Optional<Player> foundPlayer = playerRepository.findByLogin(login);
-        if (foundPlayer.isPresent() && foundPlayer.get().getPassword().equals(password)) {
-            System.out.println("Вы успешно авторизованы!\n");
-            return foundPlayer.get();
+    public PlayerResponseDto authorization(PlayerRequestDto playerRequestDto) throws InvalidInputException {
+        checkLoginAndPasswordOrThrow(playerRequestDto);
+        Optional<Player> foundPlayer = playerRepository.findByLogin(playerRequestDto.login());
+        if (foundPlayer.isPresent() && foundPlayer.get().getPassword().equals(playerRequestDto.password())) {
+            log.debug("Игрок login={} успешно авторизован.", playerRequestDto.login());
+            return PlayerMapper.INSTANCE.toResponseDto(foundPlayer.get());
         } else {
-            System.out.println("Вы ошиблись при вводе логина или пароля!\n");
-            return null;
+            log.warn("Логин или пароль не валидны.");
+            throw new InvalidInputException("Логин или пароль не валидны.");
         }
     }
 
     @Override
-    public Player debitForPlayer(String loginPlayer, long transactionId, double debitSize) throws RuntimeException {
+    public PlayerResponseDto debitForPlayer(String loginPlayer,
+                                            TransactionRequestDto transactionRequestDto) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
-        BigDecimal bigDecimalDebit = BigDecimal.valueOf(debitSize);
-        // Сравнение двух BigDecimal чисел
+        BigDecimal bigDecimalDebit = BigDecimal.valueOf(transactionRequestDto.size());
         int comparisonResult = balancePlayer.compareTo(bigDecimalDebit);
-        //Когда balancePlayer < bigDecimalDebit
+        //Когда баланс игрока < размер дебита
         if (comparisonResult < 0) {
+            log.warn("У игрока login={} не достаточно средств для дебита.", foundPlayer.getLogin());
             throw new InvalidInputException("У вас нету столько средств на балансе.");
         }
-        transactionService.createTransaction(
-                new Transaction(transactionId, TransactionType.DEBIT, debitSize, foundPlayer.getId(), Instant.now()));
-
+        transactionService.createTransaction(TransactionMapper.INSTANCE
+                .toEntity(transactionRequestDto, foundPlayer.getId()));
         foundPlayer.setBalance(balancePlayer.subtract(bigDecimalDebit));
         playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
-        return foundPlayer;
+        log.info("У игрока login={} успешно прошло действие дебит", loginPlayer);
+        return PlayerMapper.INSTANCE.toResponseDto(foundPlayer);
     }
 
     @Override
-    public Player creditForPlayer(String loginPlayer, long transactionId, double creditSize) throws RuntimeException {
+    public PlayerResponseDto creditForPlayer(String loginPlayer,
+                                             TransactionRequestDto transactionRequestDto) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
-        transactionService.createTransaction(
-                new Transaction(transactionId, TransactionType.CREDIT, creditSize, foundPlayer.getId(), Instant.now()));
-        foundPlayer.setBalance(balancePlayer.add(BigDecimal.valueOf(creditSize)));
+        transactionService.createTransaction(TransactionMapper.INSTANCE
+                .toEntity(transactionRequestDto, foundPlayer.getId()));
+        foundPlayer.setBalance(balancePlayer.add(BigDecimal.valueOf(transactionRequestDto.size())));
         playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
-        return foundPlayer;
+        log.info("У игрока login={} успешно прошло действие кредит", loginPlayer);
+        return PlayerMapper.INSTANCE.toResponseDto(foundPlayer);
     }
 
+    /**
+     * Метод для проверки игрока в БД
+     *
+     * @param loginPlayer логин игрока
+     * @return найденный игрока
+     * @throws NotFoundException если игрока не найден
+     */
     private Player findAndCheckPlayerByLogin(String loginPlayer) throws NotFoundException {
         Optional<Player> foundPlayer = playerRepository.findByLogin(loginPlayer);
         if (foundPlayer.isEmpty()) {
@@ -104,8 +119,15 @@ public class PlayerServiceImpl implements PlayerService {
         return foundPlayer.get();
     }
 
-    private void checkLoginAndPasswordOrThrow(String login, String password) throws InvalidInputException {
-        if (login == null || password == null || login.isBlank() || password.isBlank()) {
+    /**
+     * Метод для проверки валидности логин и пароля игрока
+     *
+     * @param playerRequestDto дто объект игрока
+     * @throws InvalidInputException если проверка не пройдена
+     */
+    private void checkLoginAndPasswordOrThrow(PlayerRequestDto playerRequestDto) throws InvalidInputException {
+        if (playerRequestDto.login() == null || playerRequestDto.password() == null ||
+                playerRequestDto.login().isBlank() || playerRequestDto.password().isBlank()) {
             throw new InvalidInputException("Логин или пароль не может быть пустым.");
         }
     }

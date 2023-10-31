@@ -1,7 +1,9 @@
 package org.example.repository;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
-import org.example.model.Player;
 import org.example.util.DatabaseConnector;
 
 import java.sql.*;
@@ -11,6 +13,7 @@ import java.util.Optional;
  * Класс отвечающий за взаимодействие сущности Player с БД
  */
 public class PlayerRepositoryImpl implements PlayerRepository {
+    private static final Logger log = LogManager.getLogger(PlayerRepositoryImpl.class);
     private static final String INSERT_SQL = "INSERT INTO wallet.players (login, password) VALUES (?, ?)";
     private static final String SELECT_SQL = "SELECT * FROM wallet.players WHERE login = ?";
     private static final String UPDATE_BALANCE_SQL = "UPDATE wallet.players SET balance = ? WHERE login = ?";
@@ -50,7 +53,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
             preparedStatement.setString(2, password);
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted == 0) {
-                System.err.printf("Игрок с login=%s не сохранился.%n", loginPlayer);
+                log.warn("Игрок с login={} не сохранился.", loginPlayer);
             }
         } catch (SQLException e) {
             throw new SaveEntityException(e.getMessage());
@@ -73,7 +76,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 return Optional.of(foundPlayer);
             }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            log.warn(e.getMessage());
         }
         return Optional.empty();
     }
@@ -86,11 +89,11 @@ public class PlayerRepositoryImpl implements PlayerRepository {
             preparedStatement.setString(2, loginPlayer);
             int rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated == 0) {
-                System.err.printf("У игрока с login=%s не обновился баланс.%n", loginPlayer);
+                log.warn("У игрока с login={} не обновился баланс.", loginPlayer);
             }
 
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 }

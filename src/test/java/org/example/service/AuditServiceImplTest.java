@@ -1,8 +1,10 @@
 package org.example.service;
 
 import org.assertj.core.api.Assertions;
-import org.example.model.Audit;
+import org.example.domain.dto.AuditResponseDto;
+import org.example.domain.model.Audit;
 import org.example.repository.AuditRepository;
+import org.example.repository.PlayerRepository;
 import org.example.util.AuditType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -17,15 +19,16 @@ import static org.mockito.Mockito.when;
 /**
  * Класс для тестирования AuditService
  */
-class AuditServiceTest {
+class AuditServiceImplTest {
     static AuditService service;
     static Long playerId;
 
     @BeforeAll
     static void init() {
         AuditRepository auditRepository = Mockito.mock(AuditRepository.class);
+        PlayerRepository playerRepository = Mockito.mock(PlayerRepository.class);
 
-        service = new AuditServiceImpl(auditRepository);
+        service = new AuditServiceImpl(auditRepository, playerRepository);
         playerId = 1L;
         when(auditRepository.findAuditsByPlayerIdByCreatedTime(playerId))
                 .thenReturn(List.of(
@@ -53,8 +56,8 @@ class AuditServiceTest {
     @DisplayName("Удачное создание и нахождение аудита по идентификатору игрока")
     void createAndFindAuditByLoginPlayer() {
         AuditType auditType = AuditType.REGISTRATION;
-        service.addAudit(auditType, playerId);
-        Audit foundAudit = service.findAuditsByLoginPlayer(playerId).get(0);
+        service.createAudit(auditType, playerId);
+        AuditResponseDto foundAudit = service.findAuditsByLoginPlayer(playerId).get(0);
         Assertions.assertThat(foundAudit.playerId().equals(playerId) &&
                         foundAudit.type().equals(auditType))
                 .as("Аудит не соответствует ожиданиям")

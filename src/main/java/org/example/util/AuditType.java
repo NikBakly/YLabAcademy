@@ -6,11 +6,8 @@ package org.example.util;
 public enum AuditType {
     REGISTRATION,
     AUTHORIZATION,
-    EXIT,
-    ERROR_ENTERING_COMMAND,
     CREDIT,
     DEBIT,
-    BALANCE_REQUEST,
     REQUEST_CREDIT_HISTORY,
     REQUEST_DEBIT_HISTORY,
 }
