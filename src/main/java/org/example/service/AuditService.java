@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.dto.AuditResponseDto;
+import org.example.domain.dto.AuditResponseDto;
 import org.example.util.AuditType;
 
 import java.util.List;

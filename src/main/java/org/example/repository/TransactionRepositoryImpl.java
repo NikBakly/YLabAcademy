@@ -2,9 +2,9 @@ package org.example.repository;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.dto.TransactionResponseDto;
+import org.example.domain.dto.TransactionResponseDto;
+import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
-import org.example.model.Transaction;
 import org.example.util.DatabaseConnector;
 import org.example.util.TransactionType;
 

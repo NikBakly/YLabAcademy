@@ -1,8 +1,8 @@
 package org.example.service;
 
-import org.example.dto.PlayerRequestDto;
-import org.example.dto.PlayerResponseDto;
-import org.example.dto.TransactionRequestDto;
+import org.example.domain.dto.PlayerRequestDto;
+import org.example.domain.dto.PlayerResponseDto;
+import org.example.domain.dto.TransactionRequestDto;
 import org.example.exception.InvalidInputException;
 import org.example.exception.SaveEntityException;
 
@@ -32,9 +32,7 @@ public interface PlayerService {
     /**
      * Метод для выполнения дебет(списание средств) операции по логину игрока.
      *
-     * @param loginPlayer   логин игрока, к которому будет выполнена операция дебет.
-     * @param transactionId уникальный id транзакции.
-     * @param debitSize     размер средств для списания.
+     * @param loginPlayer логин игрока, к которому будет выполнена операция дебет.
      * @throws RuntimeException ошибка при не выполненной операции.
      */
     PlayerResponseDto debitForPlayer(String loginPlayer, TransactionRequestDto transactionRequestDto)
@@ -43,9 +41,7 @@ public interface PlayerService {
     /**
      * Метод для выполнения кредит(пополнения средств) операции по логину игрока.
      *
-     * @param loginPlayer   логин игрока, к которому будет выполнена операция дебет.
-     * @param transactionId уникальный id транзакции.
-     * @param creditSize    размер средств для пополнения.
+     * @param loginPlayer логин игрока, к которому будет выполнена операция дебет.
      * @throws RuntimeException ошибка при не выполненной операции.
      */
     PlayerResponseDto creditForPlayer(String loginPlayer, TransactionRequestDto transactionRequestDto)

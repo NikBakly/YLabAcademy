@@ -9,7 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.dto.TransactionResponseDto;
+import org.example.domain.dto.TransactionResponseDto;
 import org.example.service.TransactionService;
 import org.example.service.TransactionServiceImpl;
 import org.example.util.JwtUtil;

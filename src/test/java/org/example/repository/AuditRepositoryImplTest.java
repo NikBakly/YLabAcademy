@@ -1,7 +1,7 @@
 package org.example.repository;
 
 import org.assertj.core.api.Assertions;
-import org.example.model.Audit;
+import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.example.util.DatabaseConnector;
 import org.example.util.LiquibaseManager;

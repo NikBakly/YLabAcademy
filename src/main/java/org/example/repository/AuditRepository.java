@@ -1,6 +1,6 @@
 package org.example.repository;
 
-import org.example.model.Audit;
+import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 
 import java.util.List;

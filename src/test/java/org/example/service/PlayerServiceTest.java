@@ -1,12 +1,12 @@
 package org.example.service;
 
 import org.assertj.core.api.Assertions;
-import org.example.dto.PlayerRequestDto;
-import org.example.dto.PlayerResponseDto;
-import org.example.dto.TransactionRequestDto;
+import org.example.domain.dto.PlayerRequestDto;
+import org.example.domain.dto.PlayerResponseDto;
+import org.example.domain.dto.TransactionRequestDto;
+import org.example.domain.model.Player;
 import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
-import org.example.model.Player;
 import org.example.repository.PlayerRepository;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.BeforeAll;

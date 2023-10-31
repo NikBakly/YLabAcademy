@@ -1,7 +1,7 @@
 package org.example.mapper;
 
-import org.example.dto.PlayerResponseDto;
-import org.example.model.Player;
+import org.example.domain.dto.PlayerResponseDto;
+import org.example.domain.model.Player;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

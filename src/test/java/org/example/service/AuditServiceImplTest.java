@@ -1,8 +1,8 @@
 package org.example.service;
 
 import org.assertj.core.api.Assertions;
-import org.example.dto.AuditResponseDto;
-import org.example.model.Audit;
+import org.example.domain.dto.AuditResponseDto;
+import org.example.domain.model.Audit;
 import org.example.repository.AuditRepository;
 import org.example.repository.PlayerRepository;
 import org.example.util.AuditType;

@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.domain.model;
 
 import org.example.util.TransactionType;
 

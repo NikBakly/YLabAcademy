@@ -1,8 +1,8 @@
 package org.example.repository;
 
 import org.assertj.core.api.Assertions;
+import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
-import org.example.model.Player;
 import org.example.util.DatabaseConnector;
 import org.example.util.LiquibaseManager;
 import org.junit.jupiter.api.*;

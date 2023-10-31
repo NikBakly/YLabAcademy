@@ -1,8 +1,8 @@
 package org.example.service;
 
 import org.assertj.core.api.Assertions;
-import org.example.dto.TransactionResponseDto;
-import org.example.model.Transaction;
+import org.example.domain.dto.TransactionResponseDto;
+import org.example.domain.model.Transaction;
 import org.example.repository.TransactionRepository;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.BeforeAll;

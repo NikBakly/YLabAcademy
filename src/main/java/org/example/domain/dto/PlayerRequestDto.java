@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.domain.dto;
 
 /**
  * Класс обрабатывающий запрос для сущности Player

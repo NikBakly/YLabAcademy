@@ -2,10 +2,10 @@ package org.example.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.dto.AuditResponseDto;
+import org.example.domain.dto.AuditResponseDto;
+import org.example.domain.model.Audit;
+import org.example.domain.model.Player;
 import org.example.mapper.AuditListMapper;
-import org.example.model.Audit;
-import org.example.model.Player;
 import org.example.repository.AuditRepository;
 import org.example.repository.AuditRepositoryImpl;
 import org.example.repository.PlayerRepository;

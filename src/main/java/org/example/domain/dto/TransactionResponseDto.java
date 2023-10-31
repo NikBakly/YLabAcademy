@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.example.util.TransactionType;

@@ -2,8 +2,8 @@ package org.example.repository;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
-import org.example.model.Player;
 import org.example.util.DatabaseConnector;
 
 import java.sql.*;
