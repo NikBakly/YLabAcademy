@@ -6,12 +6,14 @@ import org.example.domain.model.Player;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 class PlayerMapperTest {
 
     @Test
     @DisplayName("Преобразование объекта Player в объект PlayerResponseDto")
     void testToResponseDto() {
-        Player expectedPlayer = new Player(1L, "login", "password", 0.0);
+        Player expectedPlayer = new Player(1L, "login", "password", BigDecimal.ZERO);
 
         PlayerResponseDto actualPlayer = PlayerMapper.INSTANCE.toResponseDto(expectedPlayer);
 

@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.when;
 
@@ -88,13 +87,13 @@ class PlayerControllerTest {
         PlayerResponseDto expectedPlayer = new PlayerResponseDto(playerId, loginPlayer, BigDecimal.valueOf(balancePlayer));
         when(playerService.authorization(playerRequestDto)).thenReturn(expectedPlayer);
 
-        ResponseEntity<Map<String, String>> response = playerController.authorization(playerRequestDto);
+        ResponseEntity<ResponseJwtToken> response = playerController.authorization(playerRequestDto);
 
         Mockito.verify(playerService).authorization(playerRequestDto);
         Assertions.assertThat(response.getStatusCode())
                 .isEqualTo(HttpStatus.OK);
 
-        String actualJwtToken = response.getBody().get("jwt token");
+        String actualJwtToken = response.getBody().jwtToken();
         Claims claims = Jwts.parser()
                 .setSigningKey(JwtUtil.secret)
                 .parseClaimsJws(actualJwtToken)

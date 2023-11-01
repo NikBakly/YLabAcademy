@@ -41,8 +41,8 @@ class PlayerServiceTest {
     @BeforeEach
     void setPlayerService() {
         playerId = 1L;
-        expectedPlayer = new Player(playerId, loginPlayer, passwordPlayer, 0.0);
-        expectedPlayerResponseDto = new PlayerResponseDto(1L, loginPlayer, BigDecimal.valueOf(0.0));
+        expectedPlayer = new Player(playerId, loginPlayer, passwordPlayer, BigDecimal.ZERO);
+        expectedPlayerResponseDto = new PlayerResponseDto(1L, loginPlayer, BigDecimal.ZERO);
 
         PlayerRepository playerRepository = Mockito.mock(PlayerRepository.class);
         TransactionService transactionService = Mockito.mock(TransactionService.class);

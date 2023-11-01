@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Api(tags = "PlayerController")
 @RestController
@@ -57,10 +56,10 @@ public class PlayerController {
      */
     @ApiOperation("Метод для авторизации игрока")
     @PostMapping(value = "/authorization", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, String>> authorization(@RequestBody PlayerRequestDto playerRequestDto) {
+    public ResponseEntity<ResponseJwtToken> authorization(@RequestBody PlayerRequestDto playerRequestDto) {
         PlayerResponseDto playerResponseDto = playerService.authorization(playerRequestDto);
         String jwtToken = getJwtToken(playerResponseDto);
-        return ResponseEntity.ok(Map.of("jwt token", jwtToken));
+        return ResponseEntity.ok(new ResponseJwtToken(jwtToken));
     }
 
     /**

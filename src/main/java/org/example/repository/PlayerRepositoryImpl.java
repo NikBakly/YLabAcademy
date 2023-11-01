@@ -7,6 +7,7 @@ import org.example.exception.SaveEntityException;
 import org.example.util.DatabaseConnector;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Optional;
 
@@ -73,8 +74,8 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 Long playerId = resultSet.getLong("id");
                 String login = resultSet.getString("login");
                 String password = resultSet.getString("password");
-                Double balance = resultSet.getDouble("balance");
-                Player foundPlayer = new Player(playerId, login, password, balance);
+                double balance = resultSet.getDouble("balance");
+                Player foundPlayer = new Player(playerId, login, password, BigDecimal.valueOf(balance));
                 return Optional.of(foundPlayer);
             }
         } catch (SQLException e) {
