@@ -1,7 +1,7 @@
 package org.example.util;
 
 /**
- * Клас хранит для подключения к БД
+ * Класс хранит для подключения к БД
  */
 public class DatabaseConnector {
     public static final String URL = "jdbc:postgresql://localhost:5432/walletService";
