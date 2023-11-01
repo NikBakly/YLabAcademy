@@ -57,20 +57,6 @@ class TransactionServiceTest {
                 ));
     }
 
-
-    /**
-     * Тест для проверки шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Проверка шаблона проектирования Singleton.")
-    void testGetInstance() {
-        TransactionServiceImpl firstPointer = TransactionServiceImpl.getInstance();
-        TransactionServiceImpl secondPointer = TransactionServiceImpl.getInstance();
-        Assertions.assertThat(firstPointer)
-                .as("Указатели ссылаются на разные объекты.")
-                .isEqualTo(secondPointer);
-    }
-
     /**
      * Тест для проверки создания debit транзакции и просмотра ее истории
      */

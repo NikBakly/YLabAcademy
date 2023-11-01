@@ -11,25 +11,24 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.example.domain.dto.PlayerRequestDto;
 import org.example.domain.model.Transaction;
 import org.example.service.AuditService;
-import org.example.service.AuditServiceImpl;
 import org.example.util.AuditType;
 import org.example.util.TransactionType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Основной аспект для логирования сервисный действий
  */
 @Aspect
+@Component
 public class LoggableServiceAspect {
     private static final Logger log = LogManager.getLogger(LoggableServiceAspect.class);
 
     private final AuditService auditService;
 
+    @Autowired
     public LoggableServiceAspect(AuditService auditService) {
         this.auditService = auditService;
-    }
-
-    public LoggableServiceAspect() {
-        this.auditService = AuditServiceImpl.getInstance();
     }
 
     /**

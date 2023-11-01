@@ -12,7 +12,7 @@ public interface AuditRepository {
     /**
      * Метод для добавления аудита.
      *
-     * @param auditType тип
+     * @param auditType тип аудита
      * @param playerId  идентификатор игрока
      */
     void createAudit(AuditType auditType, Long playerId);

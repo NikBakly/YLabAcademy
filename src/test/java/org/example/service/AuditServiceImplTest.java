@@ -37,19 +37,6 @@ class AuditServiceImplTest {
     }
 
     /**
-     * Тест для проверки шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Проверка шаблона проектирования Singleton.")
-    void testGetInstance() {
-        AuditServiceImpl first = AuditServiceImpl.getInstance();
-        AuditServiceImpl secondPointer = AuditServiceImpl.getInstance();
-        Assertions.assertThat(first)
-                .as("Указатели ссылаются на разные объекты.")
-                .isEqualTo(secondPointer);
-    }
-
-    /**
      * Тест сохранения аудита и его нахождения по логину пользователя
      */
     @Test

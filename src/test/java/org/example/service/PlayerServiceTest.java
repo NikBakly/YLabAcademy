@@ -74,19 +74,6 @@ class PlayerServiceTest {
     }
 
     /**
-     * Тест для проверки шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Проверка шаблона проектирования Singleton.")
-    void testGetInstance() {
-        PlayerServiceImpl firstPointer = PlayerServiceImpl.getInstance();
-        PlayerServiceImpl secondPointer = PlayerServiceImpl.getInstance();
-        Assertions.assertThat(firstPointer)
-                .as("Указатели ссылаются на разные объекты.")
-                .isEqualTo(secondPointer);
-    }
-
-    /**
      * Тест для проверки отработки исключения при передаче в метод регистрации пустое поле login
      */
     @Test

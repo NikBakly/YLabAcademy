@@ -13,40 +13,24 @@ import org.example.exception.SaveEntityException;
 import org.example.mapper.PlayerMapper;
 import org.example.mapper.TransactionMapper;
 import org.example.repository.PlayerRepository;
-import org.example.repository.PlayerRepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
+@Service
 @LoggableService
 public class PlayerServiceImpl implements PlayerService {
     private static final Logger log = LogManager.getLogger(PlayerServiceImpl.class);
-    private static PlayerServiceImpl instance;
 
     private final PlayerRepository playerRepository;
     private final TransactionService transactionService;
 
-
-    private PlayerServiceImpl() {
-        this.playerRepository = new PlayerRepositoryImpl();
-        this.transactionService = TransactionServiceImpl.getInstance();
-    }
-
+    @Autowired
     public PlayerServiceImpl(PlayerRepository playerRepository, TransactionService transactionService) {
         this.playerRepository = playerRepository;
         this.transactionService = transactionService;
-    }
-
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность PlayerService
-     */
-    public static PlayerServiceImpl getInstance() {
-        if (instance == null) {
-            instance = new PlayerServiceImpl();
-        }
-        return instance;
     }
 
     @Override

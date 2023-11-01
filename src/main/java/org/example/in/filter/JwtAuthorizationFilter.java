@@ -1,11 +1,8 @@
-package org.example.in.servlets.filter;
+package org.example.in.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,8 +18,15 @@ public class JwtAuthorizationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
-                         FilterChain filterChain) throws IOException {
+                         FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
+        System.out.println(httpRequest.getServletPath());
+        System.out.println("empty context path ((");
+        if (httpRequest.getServletPath().equals("/players/registration") ||
+                httpRequest.getServletPath().equals("/players/authorization")) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
         String token = httpRequest.getHeader("Authorization");
 
         if (token != null) {
