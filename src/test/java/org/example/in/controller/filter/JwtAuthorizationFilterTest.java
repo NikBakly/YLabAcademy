@@ -36,7 +36,7 @@ public class JwtAuthorizationFilterTest {
     }
 
     @Test
-    @DisplayName("Успешное прохождение")
+    @DisplayName("Валидация верного jwt-токена")
     public void testValidToken() throws Exception {
         String token = Jwts.builder()
                 .setSubject("authorization")
@@ -46,6 +46,7 @@ public class JwtAuthorizationFilterTest {
                 .compact();
 
         when(request.getHeader("Authorization")).thenReturn(token);
+        when(request.getServletPath()).thenReturn("players/transactions");
 
         filter.doFilter(request, response, filterChain);
 
@@ -54,6 +55,7 @@ public class JwtAuthorizationFilterTest {
     }
 
     @Test
+    @DisplayName("Валидация устаревшего jwt-токена")
     public void testExpiredToken() throws Exception {
         String token = Jwts.builder()
                 .setSubject("authorization")
@@ -63,6 +65,7 @@ public class JwtAuthorizationFilterTest {
                 .compact();
 
         when(request.getHeader("Authorization")).thenReturn(token);
+        when(request.getServletPath()).thenReturn("players/transactions");
 
         filter.doFilter(request, response, filterChain);
 
@@ -71,10 +74,12 @@ public class JwtAuthorizationFilterTest {
     }
 
     @Test
+    @DisplayName("Валидация неверного jwt-токена")
     public void testInvalidToken() throws Exception {
         String token = "invalid_token";
 
         when(request.getHeader("Authorization")).thenReturn(token);
+        when(request.getServletPath()).thenReturn("players/transactions");
 
         filter.doFilter(request, response, filterChain);
 
@@ -83,9 +88,10 @@ public class JwtAuthorizationFilterTest {
     }
 
     @Test
-    @DisplayName("Отсутствие токена")
+    @DisplayName("Валидация пустого jwt-токена")
     public void testMissingToken() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(null);
+        when(request.getServletPath()).thenReturn("players/transactions");
 
         filter.doFilter(request, response, filterChain);
 

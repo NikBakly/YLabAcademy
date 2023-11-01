@@ -24,11 +24,14 @@ import org.springframework.stereotype.Component;
 public class LoggableServiceAspect {
     private static final Logger log = LogManager.getLogger(LoggableServiceAspect.class);
 
-    private final AuditService auditService;
+    private AuditService auditService;
 
     @Autowired
     public LoggableServiceAspect(AuditService auditService) {
         this.auditService = auditService;
+    }
+
+    public LoggableServiceAspect() {
     }
 
     /**
@@ -78,6 +81,9 @@ public class LoggableServiceAspect {
      */
     @After("annotatedByPlayerServiceImpl()")
     public void addAuditFromPlayerServiceImpl(JoinPoint joinPoint) {
+        if (!checkWorkAspect()) {
+            return;
+        }
         String nameMethod = joinPoint.getSignature().getName();
 
         AuditType auditType = getAuditTypeByNameMethod(nameMethod);
@@ -95,6 +101,9 @@ public class LoggableServiceAspect {
      */
     @After("annotatedByTransactionServiceImpl()")
     public void addAuditFromTransactionServiceImpl(JoinPoint joinPoint) {
+        if (!checkWorkAspect()) {
+            return;
+        }
         String nameMethod = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
         if (nameMethod.equals("createTransaction")) {
@@ -184,5 +193,16 @@ public class LoggableServiceAspect {
             result = playerRequestDto.login();
         }
         return result;
+    }
+
+    /**
+     * Метод проверяет разрешение на работу аспекта
+     *
+     * @return разарешение на работу
+     */
+    private boolean checkWorkAspect() {
+        // Проверяем системное свойство или переменную окружения
+        String disableAspect = System.getProperty("disableAspect");
+        return disableAspect == null || !"true".equalsIgnoreCase(disableAspect);
     }
 }

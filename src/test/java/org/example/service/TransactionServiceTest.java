@@ -55,6 +55,9 @@ class TransactionServiceTest {
                         loginPlayer,
                         Instant.now())
                 ));
+
+        //Отключение аспектов
+        System.setProperty("disableAspect", "true");
     }
 
     /**

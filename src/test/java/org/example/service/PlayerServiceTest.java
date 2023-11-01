@@ -71,6 +71,9 @@ class PlayerServiceTest {
         transactionId = 1;
         creditSize = 1200;
         debitSize = creditSize - 200;
+
+        //Отключение аспектов
+        System.setProperty("disableAspect", "true");
     }
 
     /**

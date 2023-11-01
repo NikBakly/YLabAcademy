@@ -51,7 +51,7 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public List<AuditResponseDto> findAuditsByLoginPlayer(Long playerId) {
         List<Audit> foundAudits = auditRepository.findAuditsByPlayerIdByCreatedTime(playerId);
-        log.info("Все аудита игрока с id={} найдены", playerId);
+        log.info("Все аудиты игрока с id={} найдены", playerId);
         return AuditListMapper.INSTANCE.toResponsesAuditDto(foundAudits);
     }
 }

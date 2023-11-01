@@ -20,8 +20,6 @@ public class JwtAuthorizationFilter implements Filter {
                          ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
-        System.out.println(httpRequest.getServletPath());
-        System.out.println("empty context path ((");
         if (httpRequest.getServletPath().equals("/players/registration") ||
                 httpRequest.getServletPath().equals("/players/authorization")) {
             filterChain.doFilter(servletRequest, servletResponse);
