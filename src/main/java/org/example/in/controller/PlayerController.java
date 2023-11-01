@@ -2,6 +2,8 @@ package org.example.in.controller;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.example.domain.dto.*;
 import org.example.exception.InvalidInputException;
 import org.example.service.AuditService;
@@ -19,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Api(tags = "PlayerController")
 @RestController
 @RequestMapping("/players")
 public class PlayerController {
@@ -39,6 +42,7 @@ public class PlayerController {
      * @param newPlayer информация об игроке
      * @return ответ на HTTP-запрос
      */
+    @ApiOperation("Метод для регистрации игрока")
     @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PlayerResponseDto> registration(@RequestBody PlayerRequestDto newPlayer) {
         PlayerResponseDto playerResponseDto = playerService.registration(newPlayer);
@@ -51,6 +55,7 @@ public class PlayerController {
      * @param playerRequestDto информация об игроке
      * @return ответ на HTTP-запрос
      */
+    @ApiOperation("Метод для авторизации игрока")
     @PostMapping(value = "/authorization", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> authorization(@RequestBody PlayerRequestDto playerRequestDto) {
         PlayerResponseDto playerResponseDto = playerService.authorization(playerRequestDto);
@@ -65,6 +70,7 @@ public class PlayerController {
      * @param jwtToken              jwt-токен взят из заголовка запроса
      * @return ответ на HTTP-запрос
      */
+    @ApiOperation("Метод для создания транзакций игрока")
     @PostMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PlayerResponseDto> createTransaction(@RequestBody TransactionRequestDto transactionRequestDto,
                                                                @RequestHeader("Authorization") String jwtToken) {
@@ -84,6 +90,7 @@ public class PlayerController {
      * @param typeHistoryTransaction параметр переданный
      * @return ответ на HTTP-запрос
      */
+    @ApiOperation("Метод для получения истории по транзакциям игрока")
     @GetMapping(value = "/transactions/{typeHistoryTransaction}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TransactionResponseDto>> getHistoryTransactions(
             @RequestHeader("Authorization") String jwtToken, @PathVariable String typeHistoryTransaction) {
@@ -108,6 +115,7 @@ public class PlayerController {
      * @param jwtToken jwt-токен взят из заголовка запроса
      * @return ответ на HTTP-запрос
      */
+    @ApiOperation("Метод для получения аудитов игрока")
     @GetMapping(value = "/audits", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AuditResponseDto>> getAudits(@RequestHeader("Authorization") String jwtToken) {
         Long playerId = getPlayerIdByJwtToken(jwtToken);
