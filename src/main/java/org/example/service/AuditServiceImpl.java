@@ -24,11 +24,13 @@ public class AuditServiceImpl implements AuditService {
 
     private final AuditRepository auditRepository;
     private final PlayerRepository playerRepository;
+    private final AuditListMapper auditListMapper;
 
     @Autowired
-    public AuditServiceImpl(AuditRepository auditRepository, PlayerRepository playerRepository) {
+    public AuditServiceImpl(AuditRepository auditRepository, PlayerRepository playerRepository, AuditListMapper auditListMapper) {
         this.auditRepository = auditRepository;
         this.playerRepository = playerRepository;
+        this.auditListMapper = auditListMapper;
     }
 
     @Override
@@ -52,6 +54,6 @@ public class AuditServiceImpl implements AuditService {
     public List<AuditResponseDto> findAuditsByLoginPlayer(Long playerId) {
         List<Audit> foundAudits = auditRepository.findAuditsByPlayerIdByCreatedTime(playerId);
         log.info("Все аудиты игрока с id={} найдены", playerId);
-        return AuditListMapper.INSTANCE.toResponsesAuditDto(foundAudits);
+        return auditListMapper.toResponsesAuditDto(foundAudits);
     }
 }

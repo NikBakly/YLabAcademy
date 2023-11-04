@@ -74,8 +74,8 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 Long playerId = resultSet.getLong("id");
                 String login = resultSet.getString("login");
                 String password = resultSet.getString("password");
-                double balance = resultSet.getDouble("balance");
-                Player foundPlayer = new Player(playerId, login, password, BigDecimal.valueOf(balance));
+                BigDecimal balance = resultSet.getBigDecimal("balance");
+                Player foundPlayer = new Player(playerId, login, password, balance);
                 return Optional.of(foundPlayer);
             }
         } catch (SQLException e) {
