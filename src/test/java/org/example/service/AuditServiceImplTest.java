@@ -3,6 +3,9 @@ package org.example.service;
 import org.assertj.core.api.Assertions;
 import org.example.domain.dto.AuditResponseDto;
 import org.example.domain.model.Audit;
+import org.example.mapper.AuditListMapper;
+import org.example.mapper.AuditListMapperImpl;
+import org.example.mapper.AuditMapperImpl;
 import org.example.repository.AuditRepository;
 import org.example.repository.PlayerRepository;
 import org.example.util.AuditType;
@@ -27,8 +30,8 @@ class AuditServiceImplTest {
     static void init() {
         AuditRepository auditRepository = Mockito.mock(AuditRepository.class);
         PlayerRepository playerRepository = Mockito.mock(PlayerRepository.class);
-
-        service = new AuditServiceImpl(auditRepository, playerRepository);
+        AuditListMapper auditListMapper = new AuditListMapperImpl(new AuditMapperImpl());
+        service = new AuditServiceImpl(auditRepository, playerRepository, auditListMapper);
         playerId = 1L;
         when(auditRepository.findAuditsByPlayerIdByCreatedTime(playerId))
                 .thenReturn(List.of(

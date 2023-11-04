@@ -9,18 +9,27 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 class PlayerMapperTest {
+    private final PlayerMapper playerMapper = new PlayerMapperImpl();
 
     @Test
     @DisplayName("Преобразование объекта Player в объект PlayerResponseDto")
     void testToResponseDto() {
         Player expectedPlayer = new Player(1L, "login", "password", BigDecimal.ZERO);
+        PlayerResponseDto actualPlayer = playerMapper.toResponseDto(expectedPlayer);
 
-        PlayerResponseDto actualPlayer = PlayerMapper.INSTANCE.toResponseDto(expectedPlayer);
+        Assertions.assertThat(actualPlayer).usingRecursiveComparison()
+                .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                .ignoringFields("password")
+                .isEqualTo(expectedPlayer);
+    }
 
-        Assertions.assertThat(expectedPlayer.getId().equals(actualPlayer.id()) &&
-                        expectedPlayer.getLogin().equals(actualPlayer.login()) &&
-                        expectedPlayer.getBalance().equals(actualPlayer.balance()))
-                .isTrue();
+    @Test
+    @DisplayName("Преобразование объекта Player в объект PlayerResponseDto, когда Player не определен")
+    void testToResponseDtoWhenEntityIsNull() {
+        Player expectedPlayer = null;
+        PlayerResponseDto actualPlayer = playerMapper.toResponseDto(expectedPlayer);
+
+        Assertions.assertThat(actualPlayer).isNull();
     }
 
 }

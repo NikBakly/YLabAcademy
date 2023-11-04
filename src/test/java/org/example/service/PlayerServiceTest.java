@@ -7,6 +7,8 @@ import org.example.domain.dto.TransactionRequestDto;
 import org.example.domain.model.Player;
 import org.example.exception.InvalidInputException;
 import org.example.exception.NotFoundException;
+import org.example.mapper.PlayerMapperImpl;
+import org.example.mapper.TransactionMapperImpl;
 import org.example.repository.PlayerRepository;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +49,10 @@ class PlayerServiceTest {
         PlayerRepository playerRepository = Mockito.mock(PlayerRepository.class);
         TransactionService transactionService = Mockito.mock(TransactionService.class);
 
-        playerService = new PlayerServiceImpl(playerRepository, transactionService);
+        playerService = new PlayerServiceImpl(playerRepository,
+                transactionService,
+                new PlayerMapperImpl(),
+                new TransactionMapperImpl());
 
         when(playerRepository.save(loginPlayer, passwordPlayer))
                 .thenReturn(expectedPlayer);

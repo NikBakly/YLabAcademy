@@ -10,17 +10,27 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 
 class AuditMapperTest {
+    private final AuditMapper auditMapper = new AuditMapperImpl();
+
 
     @Test
     @DisplayName("Преобразование объекта Audit в объект AuditResponseDto")
     void testToResponseDto() {
         Audit expectedAudit = new Audit(1L, AuditType.REGISTRATION, 1L, Instant.now());
+        AuditResponseDto actualAudit = auditMapper.toResponseDto(expectedAudit);
 
-        AuditResponseDto actualAudit = AuditMapper.INSTANCE.toResponseDto(expectedAudit);
+        Assertions.assertThat(actualAudit).usingRecursiveComparison()
+                .withComparatorForType(Instant::compareTo, Instant.class)
+                .ignoringFields("id")
+                .isEqualTo(expectedAudit);
+    }
 
-        Assertions.assertThat(expectedAudit.playerId().equals(actualAudit.playerId()) &&
-                        expectedAudit.type().equals(actualAudit.type()) &&
-                        expectedAudit.createdTime().equals(actualAudit.createdTime()))
-                .isTrue();
+    @Test
+    @DisplayName("Преобразование объекта Audit в объект AuditResponseDto, когда Audit не определен")
+    void testToResponseDtoWhenEntityIsNull() {
+        Audit expectedAudit = null;
+        AuditResponseDto actualAudit = auditMapper.toResponseDto(expectedAudit);
+
+        Assertions.assertThat(actualAudit).isNull();
     }
 }

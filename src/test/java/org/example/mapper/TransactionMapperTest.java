@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 
 class TransactionMapperTest {
+    private final TransactionMapper transactionMapper = new TransactionMapperImpl();
 
     @Test
     @DisplayName("Преобразование объекта TransactionRequestDto в объект Transaction")
@@ -16,14 +17,21 @@ class TransactionMapperTest {
         Long expectedPlayerId = 1L;
         TransactionRequestDto expectedTransaction =
                 new TransactionRequestDto(1L, TransactionType.CREDIT, 0.0);
+        Transaction actualTransaction = transactionMapper.toEntity(expectedTransaction, expectedPlayerId);
 
-        Transaction actualTransaction = TransactionMapper.INSTANCE.toEntity(expectedTransaction, expectedPlayerId);
+        Assertions.assertThat(actualTransaction).usingRecursiveComparison()
+                .ignoringFields("playerId", "createdTime")
+                .isEqualTo(expectedTransaction);
+    }
 
-        Assertions.assertThat(actualTransaction.playerId().equals(expectedPlayerId) &&
-                        actualTransaction.id().equals(expectedTransaction.id()) &&
-                        actualTransaction.type().equals(expectedTransaction.type()) &&
-                        actualTransaction.size().equals(expectedTransaction.size()))
-                .isTrue();
+    @Test
+    @DisplayName("Преобразование объекта TransactionRequestDto в объект Transaction, когда TransactionRequestDto не определен")
+    void testToEntityWhenDtoIsNull() {
+        Long expectedPlayerId = 1L;
+        TransactionRequestDto expectedTransaction = null;
+        Transaction actualTransaction = transactionMapper.toEntity(expectedTransaction, expectedPlayerId);
+
+        Assertions.assertThat(actualTransaction).isNull();
     }
 
 }
