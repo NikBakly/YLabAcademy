@@ -5,7 +5,10 @@ import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
 import org.example.util.DatabaseConnector;
 import org.example.util.LiquibaseManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,19 +28,10 @@ class PlayerRepositoryTest {
             .withUsername(DatabaseConnector.USERNAME)
             .withPassword(DatabaseConnector.PASSWORD);
 
-    PlayerRepository repository;
-    static String expectedLoginPlayer;
-    static String expectedPasswordPlayer;
+    static PlayerRepository repository;
 
     @BeforeAll
     static void init() {
-        expectedLoginPlayer = "test";
-        expectedPasswordPlayer = "test";
-    }
-
-
-    @BeforeEach
-    void initRepository() {
         postgresContainer.start();
         LiquibaseManager.runDatabaseMigrations(
                 postgresContainer.getJdbcUrl(),
@@ -51,8 +45,8 @@ class PlayerRepositoryTest {
         );
     }
 
-    @AfterEach
-    void closeContainer() {
+    @AfterAll
+    static void closeContainer() {
         postgresContainer.close();
     }
 
@@ -61,7 +55,9 @@ class PlayerRepositoryTest {
      */
     @Test
     @DisplayName("Удачное создание и нахождения игрока по его логину")
-    void saveAndFindPlayerByLogin() {
+    void testSaveAndFindPlayerByLogin() {
+        String expectedLoginPlayer = "test1";
+        String expectedPasswordPlayer = "pass";
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Player foundPlayer = repository.findByLogin(expectedLoginPlayer).get();
         Assertions.assertThat(expectedLoginPlayer)
@@ -82,7 +78,9 @@ class PlayerRepositoryTest {
      */
     @Test
     @DisplayName("Не удачное создания игрока с не уникальным логином")
-    void savePlayerWhenLoginNotUnique() {
+    void testSavePlayerWhenLoginNotUnique() {
+        String expectedLoginPlayer = "test2";
+        String expectedPasswordPlayer = "pass";
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Throwable thrown = Assertions.catchThrowable(() ->
                 repository.save(expectedLoginPlayer, expectedPasswordPlayer));
@@ -93,7 +91,9 @@ class PlayerRepositoryTest {
 
     @Test
     @DisplayName("Удачное обновление баланса у пользователя")
-    void updateBalanceByLogin() {
+    void testUpdateBalanceByLogin() {
+        String expectedLoginPlayer = "test3";
+        String expectedPasswordPlayer = "pass";
         repository.save(expectedLoginPlayer, expectedPasswordPlayer);
         Optional<Player> foundPlayer = repository.findByLogin(expectedLoginPlayer);
         if (foundPlayer.isPresent()) {
@@ -117,7 +117,8 @@ class PlayerRepositoryTest {
 
     @Test
     @DisplayName("Не удачное нахождение игрока из-за неверного логина")
-    void findPlayerByLogin() {
+    void testFindPlayerByLogin() {
+        String expectedLoginPlayer = "random";
         Optional<Player> foundPlayer = repository.findByLogin(expectedLoginPlayer);
         Assertions.assertThat(foundPlayer.isEmpty())
                 .as("Найденная сущность должна быть пустым")

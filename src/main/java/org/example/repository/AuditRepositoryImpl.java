@@ -5,12 +5,17 @@ import org.apache.logging.log4j.Logger;
 import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.example.util.DatabaseConnector;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс отвечающий за взаимодействие сущности Audit с БД
+ */
+@Repository
 public class AuditRepositoryImpl implements AuditRepository {
     private static final Logger log = LogManager.getLogger(AuditRepositoryImpl.class);
     private static final String INSERT_SQL =

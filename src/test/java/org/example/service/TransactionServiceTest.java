@@ -55,20 +55,9 @@ class TransactionServiceTest {
                         loginPlayer,
                         Instant.now())
                 ));
-    }
 
-
-    /**
-     * Тест для проверки шаблона проектирования Singleton
-     */
-    @Test
-    @DisplayName("Проверка шаблона проектирования Singleton.")
-    void getInstance() {
-        TransactionServiceImpl firstPointer = TransactionServiceImpl.getInstance();
-        TransactionServiceImpl secondPointer = TransactionServiceImpl.getInstance();
-        Assertions.assertThat(firstPointer)
-                .as("Указатели ссылаются на разные объекты.")
-                .isEqualTo(secondPointer);
+        //Отключение аспектов
+        System.setProperty("disableAspect", "true");
     }
 
     /**
@@ -76,7 +65,7 @@ class TransactionServiceTest {
      */
     @Test
     @DisplayName("Удачное создание debit транзакции и просмотр ее в историях")
-    void createAndGetHistoryDebitTransactions() {
+    void testCreateAndGetHistoryDebitTransactions() {
         transactionService.createTransaction(
                 new Transaction(transactionId, debitTransactionType, transactionSize, playerId, Instant.now()));
         List<TransactionResponseDto> foundTransactions =
@@ -101,7 +90,7 @@ class TransactionServiceTest {
      */
     @Test
     @DisplayName("Удачное создание credit транзакции и просмотр ее в историях")
-    void createAndGetHistoryCreditTransactions() {
+    void testCreateAndGetHistoryCreditTransactions() {
         transactionService.createTransaction(
                 new Transaction(transactionId, creditTransactionType, transactionSize, playerId, Instant.now()));
         List<TransactionResponseDto> foundTransactions =

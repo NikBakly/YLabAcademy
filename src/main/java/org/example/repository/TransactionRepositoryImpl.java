@@ -7,6 +7,7 @@ import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
 import org.example.util.DatabaseConnector;
 import org.example.util.TransactionType;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 /**
  * Класс отвечающий за взаимодействие сущности Transaction с БД
  */
+@Repository
 public class TransactionRepositoryImpl implements TransactionRepository {
     private static final Logger log = LogManager.getLogger(TransactionRepositoryImpl.class);
     private static final String INSERT_SQL =

@@ -5,13 +5,16 @@ import org.apache.logging.log4j.Logger;
 import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
 import org.example.util.DatabaseConnector;
+import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Optional;
 
 /**
  * Класс отвечающий за взаимодействие сущности Player с БД
  */
+@Repository
 public class PlayerRepositoryImpl implements PlayerRepository {
     private static final Logger log = LogManager.getLogger(PlayerRepositoryImpl.class);
     private static final String INSERT_SQL = "INSERT INTO wallet.players (login, password) VALUES (?, ?)";
@@ -71,7 +74,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 Long playerId = resultSet.getLong("id");
                 String login = resultSet.getString("login");
                 String password = resultSet.getString("password");
-                Double balance = resultSet.getDouble("balance");
+                BigDecimal balance = resultSet.getBigDecimal("balance");
                 Player foundPlayer = new Player(playerId, login, password, balance);
                 return Optional.of(foundPlayer);
             }

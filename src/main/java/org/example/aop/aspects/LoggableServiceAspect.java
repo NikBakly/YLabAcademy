@@ -11,25 +11,27 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.example.domain.dto.PlayerRequestDto;
 import org.example.domain.model.Transaction;
 import org.example.service.AuditService;
-import org.example.service.AuditServiceImpl;
 import org.example.util.AuditType;
 import org.example.util.TransactionType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Основной аспект для логирования сервисный действий
  */
 @Aspect
+@Component
 public class LoggableServiceAspect {
     private static final Logger log = LogManager.getLogger(LoggableServiceAspect.class);
 
-    private final AuditService auditService;
+    private AuditService auditService;
 
+    @Autowired
     public LoggableServiceAspect(AuditService auditService) {
         this.auditService = auditService;
     }
 
     public LoggableServiceAspect() {
-        this.auditService = AuditServiceImpl.getInstance();
     }
 
     /**
@@ -79,6 +81,9 @@ public class LoggableServiceAspect {
      */
     @After("annotatedByPlayerServiceImpl()")
     public void addAuditFromPlayerServiceImpl(JoinPoint joinPoint) {
+        if (!checkWorkAspect()) {
+            return;
+        }
         String nameMethod = joinPoint.getSignature().getName();
 
         AuditType auditType = getAuditTypeByNameMethod(nameMethod);
@@ -96,6 +101,9 @@ public class LoggableServiceAspect {
      */
     @After("annotatedByTransactionServiceImpl()")
     public void addAuditFromTransactionServiceImpl(JoinPoint joinPoint) {
+        if (!checkWorkAspect()) {
+            return;
+        }
         String nameMethod = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
         if (nameMethod.equals("createTransaction")) {
@@ -185,5 +193,16 @@ public class LoggableServiceAspect {
             result = playerRequestDto.login();
         }
         return result;
+    }
+
+    /**
+     * Метод проверяет разрешение на работу аспекта
+     *
+     * @return разарешение на работу
+     */
+    private boolean checkWorkAspect() {
+        // Проверяем системное свойство или переменную окружения
+        String disableAspect = System.getProperty("disableAspect");
+        return disableAspect == null || !"true".equalsIgnoreCase(disableAspect);
     }
 }

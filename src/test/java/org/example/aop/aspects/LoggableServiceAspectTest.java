@@ -8,9 +8,11 @@ import org.example.domain.model.Transaction;
 import org.example.service.AuditService;
 import org.example.util.AuditType;
 import org.example.util.TransactionType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -20,7 +22,14 @@ class LoggableServiceAspectTest {
     @Mock
     private AuditService auditService;
 
+    @InjectMocks
     private LoggableServiceAspect loggableServiceAspect;
+
+    @BeforeAll
+    static void init() {
+        //Отключение аспектов
+        System.setProperty("disableAspect", "false");
+    }
 
     @BeforeEach
     public void setUp() {

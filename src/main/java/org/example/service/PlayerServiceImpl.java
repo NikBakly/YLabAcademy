@@ -13,40 +13,31 @@ import org.example.exception.SaveEntityException;
 import org.example.mapper.PlayerMapper;
 import org.example.mapper.TransactionMapper;
 import org.example.repository.PlayerRepository;
-import org.example.repository.PlayerRepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
+@Service
 @LoggableService
 public class PlayerServiceImpl implements PlayerService {
     private static final Logger log = LogManager.getLogger(PlayerServiceImpl.class);
-    private static PlayerServiceImpl instance;
 
     private final PlayerRepository playerRepository;
     private final TransactionService transactionService;
+    private final PlayerMapper playerMapper;
+    private final TransactionMapper transactionMapper;
 
-
-    private PlayerServiceImpl() {
-        this.playerRepository = new PlayerRepositoryImpl();
-        this.transactionService = TransactionServiceImpl.getInstance();
-    }
-
-    public PlayerServiceImpl(PlayerRepository playerRepository, TransactionService transactionService) {
+    @Autowired
+    public PlayerServiceImpl(PlayerRepository playerRepository,
+                             TransactionService transactionService,
+                             PlayerMapper playerMapper,
+                             TransactionMapper transactionMapper) {
         this.playerRepository = playerRepository;
         this.transactionService = transactionService;
-    }
-
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность PlayerService
-     */
-    public static PlayerServiceImpl getInstance() {
-        if (instance == null) {
-            instance = new PlayerServiceImpl();
-        }
-        return instance;
+        this.playerMapper = playerMapper;
+        this.transactionMapper = transactionMapper;
     }
 
     @Override
@@ -55,7 +46,7 @@ public class PlayerServiceImpl implements PlayerService {
         checkLoginAndPasswordOrThrow(playerRequestDto);
         Player newPlayer = playerRepository.save(playerRequestDto.login(), playerRequestDto.password());
         log.debug("Игрок login={} успешно зарегистрирован.", playerRequestDto.login());
-        return PlayerMapper.INSTANCE.toResponseDto(newPlayer);
+        return playerMapper.toResponseDto(newPlayer);
     }
 
     @Override
@@ -64,7 +55,7 @@ public class PlayerServiceImpl implements PlayerService {
         Optional<Player> foundPlayer = playerRepository.findByLogin(playerRequestDto.login());
         if (foundPlayer.isPresent() && foundPlayer.get().getPassword().equals(playerRequestDto.password())) {
             log.debug("Игрок login={} успешно авторизован.", playerRequestDto.login());
-            return PlayerMapper.INSTANCE.toResponseDto(foundPlayer.get());
+            return playerMapper.toResponseDto(foundPlayer.get());
         } else {
             log.warn("Логин или пароль не валидны.");
             throw new InvalidInputException("Логин или пароль не валидны.");
@@ -83,12 +74,12 @@ public class PlayerServiceImpl implements PlayerService {
             log.warn("У игрока login={} не достаточно средств для дебита.", foundPlayer.getLogin());
             throw new InvalidInputException("У вас нету столько средств на балансе.");
         }
-        transactionService.createTransaction(TransactionMapper.INSTANCE
-                .toEntity(transactionRequestDto, foundPlayer.getId()));
+        transactionService.createTransaction(transactionMapper.toEntity(transactionRequestDto, foundPlayer.getId()));
+
         foundPlayer.setBalance(balancePlayer.subtract(bigDecimalDebit));
         playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
         log.info("У игрока login={} успешно прошло действие дебит", loginPlayer);
-        return PlayerMapper.INSTANCE.toResponseDto(foundPlayer);
+        return playerMapper.toResponseDto(foundPlayer);
     }
 
     @Override
@@ -96,12 +87,12 @@ public class PlayerServiceImpl implements PlayerService {
                                              TransactionRequestDto transactionRequestDto) throws RuntimeException {
         Player foundPlayer = findAndCheckPlayerByLogin(loginPlayer);
         BigDecimal balancePlayer = foundPlayer.getBalance();
-        transactionService.createTransaction(TransactionMapper.INSTANCE
-                .toEntity(transactionRequestDto, foundPlayer.getId()));
+        transactionService.createTransaction(transactionMapper.toEntity(transactionRequestDto, foundPlayer.getId()));
+
         foundPlayer.setBalance(balancePlayer.add(BigDecimal.valueOf(transactionRequestDto.size())));
         playerRepository.updateBalanceByLogin(loginPlayer, foundPlayer.getBalance().doubleValue());
         log.info("У игрока login={} успешно прошло действие кредит", loginPlayer);
-        return PlayerMapper.INSTANCE.toResponseDto(foundPlayer);
+        return playerMapper.toResponseDto(foundPlayer);
     }
 
     /**

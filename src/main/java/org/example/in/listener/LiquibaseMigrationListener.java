@@ -1,10 +1,11 @@
-package org.example.in.servlets.listener;
+package org.example.in.listener;
 
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.annotation.WebListener;
 import org.example.util.DatabaseConnector;
 import org.example.util.LiquibaseManager;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 /**
  * Класс нужен для запуска миграции, при инициализации контекста веб-приложения

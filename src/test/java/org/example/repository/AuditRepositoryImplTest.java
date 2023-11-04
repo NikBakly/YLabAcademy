@@ -5,10 +5,7 @@ import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.example.util.DatabaseConnector;
 import org.example.util.LiquibaseManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -28,9 +25,13 @@ class AuditRepositoryImplTest {
 
     AuditRepository repository;
 
+    @BeforeAll
+    static void startContainer() {
+        postgresContainer.start();
+    }
+
     @BeforeEach
     void init() {
-        postgresContainer.start();
         LiquibaseManager.runDatabaseMigrations(
                 postgresContainer.getJdbcUrl(),
                 postgresContainer.getUsername(),
@@ -42,8 +43,8 @@ class AuditRepositoryImplTest {
         );
     }
 
-    @AfterEach
-    void closeContainer() {
+    @AfterAll
+    static void closeContainer() {
         postgresContainer.close();
     }
 
@@ -52,7 +53,7 @@ class AuditRepositoryImplTest {
      */
     @Test
     @DisplayName("Удачное создание аудитов и их нахождения по идентификатору игрока")
-    void addAndFindAuditsByLoginPlayer() {
+    void testAddAndFindAuditsByLoginPlayer() {
         Long playerId = 1L;
         // заполняем различными действиями пользователя
         repository.createAudit(AuditType.REGISTRATION, playerId);

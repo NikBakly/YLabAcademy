@@ -7,10 +7,10 @@ import org.example.domain.model.Audit;
 import org.example.domain.model.Player;
 import org.example.mapper.AuditListMapper;
 import org.example.repository.AuditRepository;
-import org.example.repository.AuditRepositoryImpl;
 import org.example.repository.PlayerRepository;
-import org.example.repository.PlayerRepositoryImpl;
 import org.example.util.AuditType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,33 +18,19 @@ import java.util.Optional;
 /**
  * Класс реализующий бизнес-логику для сущности Audit.
  */
+@Service
 public class AuditServiceImpl implements AuditService {
     private static final Logger log = LogManager.getLogger(AuditServiceImpl.class);
-    private static AuditServiceImpl instance;
 
     private final AuditRepository auditRepository;
     private final PlayerRepository playerRepository;
+    private final AuditListMapper auditListMapper;
 
-    private AuditServiceImpl() {
-        this.auditRepository = new AuditRepositoryImpl();
-        this.playerRepository = new PlayerRepositoryImpl();
-    }
-
-    public AuditServiceImpl(AuditRepository auditRepository, PlayerRepository playerRepository) {
+    @Autowired
+    public AuditServiceImpl(AuditRepository auditRepository, PlayerRepository playerRepository, AuditListMapper auditListMapper) {
         this.auditRepository = auditRepository;
         this.playerRepository = playerRepository;
-    }
-
-    /**
-     * Метод для реализации шаблона проектирования Singleton.
-     *
-     * @return сущность AuditService
-     */
-    public static AuditServiceImpl getInstance() {
-        if (instance == null) {
-            instance = new AuditServiceImpl();
-        }
-        return instance;
+        this.auditListMapper = auditListMapper;
     }
 
     @Override
@@ -67,7 +53,7 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public List<AuditResponseDto> findAuditsByLoginPlayer(Long playerId) {
         List<Audit> foundAudits = auditRepository.findAuditsByPlayerIdByCreatedTime(playerId);
-        log.info("Все аудита игрока с id={} найдены", playerId);
-        return AuditListMapper.INSTANCE.toResponsesAuditDto(foundAudits);
+        log.info("Все аудиты игрока с id={} найдены", playerId);
+        return auditListMapper.toResponsesAuditDto(foundAudits);
     }
 }
