@@ -24,12 +24,16 @@ class PlayerMapperTest {
     }
 
     @Test
-    @DisplayName("Преобразование объекта Player в объект PlayerResponseDto, когда Player не определен")
-    void testToResponseDtoWhenEntityIsNull() {
-        Player expectedPlayer = null;
+    @DisplayName("Преобразование объекта Player в объект PlayerResponseDto, когда Player пустой")
+    void testToResponseDtoWhenEntityIsBlank() {
+        Player expectedPlayer = new Player(null, null, null, null);
+
         PlayerResponseDto actualPlayer = playerMapper.toResponseDto(expectedPlayer);
 
-        Assertions.assertThat(actualPlayer).isNull();
+        Assertions.assertThat(actualPlayer).usingRecursiveComparison()
+                .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                .ignoringFields("password")
+                .isEqualTo(expectedPlayer);
     }
 
 }

@@ -25,13 +25,17 @@ class TransactionMapperTest {
     }
 
     @Test
-    @DisplayName("Преобразование объекта TransactionRequestDto в объект Transaction, когда TransactionRequestDto не определен")
-    void testToEntityWhenDtoIsNull() {
+    @DisplayName("Преобразование объекта TransactionRequestDto в объект Transaction, когда TransactionRequestDto пустой")
+    void testToEntityWhenDtoIsBlank() {
         Long expectedPlayerId = 1L;
-        TransactionRequestDto expectedTransaction = null;
+        TransactionRequestDto expectedTransaction =
+                new TransactionRequestDto(null, null, null);
+
         Transaction actualTransaction = transactionMapper.toEntity(expectedTransaction, expectedPlayerId);
 
-        Assertions.assertThat(actualTransaction).isNull();
+        Assertions.assertThat(actualTransaction).usingRecursiveComparison()
+                .ignoringFields("playerId", "createdTime")
+                .isEqualTo(expectedTransaction);
     }
 
 }

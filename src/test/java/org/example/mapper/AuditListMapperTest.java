@@ -41,13 +41,15 @@ class AuditListMapperTest {
     }
 
     @Test
-    @DisplayName("Преобразование списка объектов Audit в список объектов AuditResponseDto, когда список Audit не определен")
-    void testToResponsesAuditDtoWhenEntitiesIsNull() {
-        List<Audit> audits = null;
+    @DisplayName("Преобразование списка объектов Audit в список объектов AuditResponseDto, когда список Audit пустым")
+    void testToResponsesAuditDtoWhenEntitiesIsBlank() {
+        List<Audit> audits = List.of();
 
-        List<AuditResponseDto> actualAuditsResponseDto = auditListMapper.toResponsesAuditDto(audits);
+        List<AuditResponseDto> auditsResponseDto = auditListMapper.toResponsesAuditDto(audits);
 
-        Assertions.assertThat(actualAuditsResponseDto).isNull();
+        int expectedListSize = 0;
+
+        Assertions.assertThat(auditsResponseDto.size()).isEqualTo(expectedListSize);
 
     }
 

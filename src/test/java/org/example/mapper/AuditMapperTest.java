@@ -26,11 +26,14 @@ class AuditMapperTest {
     }
 
     @Test
-    @DisplayName("Преобразование объекта Audit в объект AuditResponseDto, когда Audit не определен")
-    void testToResponseDtoWhenEntityIsNull() {
-        Audit expectedAudit = null;
+    @DisplayName("Преобразование объекта Audit в объект AuditResponseDto, когда Audit пустой")
+    void testToResponseDtoWhenEntityIsBlank() {
+        Audit expectedAudit = new Audit(null, null, null, null);
         AuditResponseDto actualAudit = auditMapper.toResponseDto(expectedAudit);
 
-        Assertions.assertThat(actualAudit).isNull();
+        Assertions.assertThat(actualAudit).usingRecursiveComparison()
+                .withComparatorForType(Instant::compareTo, Instant.class)
+                .ignoringFields("id")
+                .isEqualTo(expectedAudit);
     }
 }
