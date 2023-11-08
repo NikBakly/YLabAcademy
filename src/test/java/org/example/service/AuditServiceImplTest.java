@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.when;
 /**
  * Класс для тестирования AuditService
  */
+@SpringBootTest
 class AuditServiceImplTest {
     static AuditService service;
     static Long playerId;

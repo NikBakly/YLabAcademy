@@ -8,6 +8,8 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,13 +19,23 @@ import java.util.Properties;
 /**
  * Класс управляет миграциями с использованием Liquibase
  */
+@Component
 public class LiquibaseManager {
     private static final Logger log = LogManager.getLogger(LiquibaseManager.class);
+
+    @Value("${spring.datasource.url}")
+    private String urlDatabase;
+
+    @Value("${spring.datasource.username}")
+    private String usernameDatabase;
+
+    @Value("${spring.datasource.password}")
+    private String passwordDatabase;
 
     /**
      * Метод запускает миграции базы данных
      */
-    public static void runDatabaseMigrations(String url, String username, String password) {
+    public void runDatabaseMigrations() {
         try {
             Class.forName("org.postgresql.Driver");
 
@@ -32,8 +44,7 @@ public class LiquibaseManager {
             Properties properties = new Properties();
             properties.load(classLoader.getResourceAsStream(propertiesFile));
 
-
-            Connection connection = DriverManager.getConnection(url, username, password);
+            Connection connection = DriverManager.getConnection(urlDatabase, usernameDatabase, passwordDatabase);
             createSchemaForLiquibaseTables(connection);
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
 
@@ -66,6 +77,4 @@ public class LiquibaseManager {
             log.warn(e.getMessage());
         }
     }
-
-
 }

@@ -6,10 +6,17 @@ import org.example.domain.model.Transaction;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-
+/**
+ * Класс для тестирования TransactionMapper
+ */
+@SpringBootTest
 class TransactionMapperTest {
-    private final TransactionMapper transactionMapper = new TransactionMapperImpl();
+
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     @Test
     @DisplayName("Преобразование объекта TransactionRequestDto в объект Transaction")
