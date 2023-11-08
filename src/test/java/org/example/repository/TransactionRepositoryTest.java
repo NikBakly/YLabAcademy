@@ -5,12 +5,15 @@ import org.example.domain.dto.TransactionResponseDto;
 import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
 import org.example.util.DatabaseConnector;
-import org.example.util.LiquibaseManager;
 import org.example.util.TransactionType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,15 +24,25 @@ import java.time.Instant;
  * Класс для тестирования TransactionInMemoryRepository
  */
 @Testcontainers
+@SpringBootTest
 class TransactionRepositoryTest {
     @Container
     private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:13.3")
             .withDatabaseName(DatabaseConnector.DATABASE_NAME)
             .withUsername(DatabaseConnector.USERNAME)
             .withPassword(DatabaseConnector.PASSWORD);
+    @Autowired
+    private TransactionRepository repository;
+    @Autowired
+    private PlayerRepository playerRepository;
 
-    static TransactionRepository repository;
-    static PlayerRepository playerRepository;
+    @DynamicPropertySource
+    static void setDataSourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
+    }
+
     static Double sizeTransaction;
     static String loginPlayer;
     static String passwordPlayer;
@@ -44,20 +57,6 @@ class TransactionRepositoryTest {
         loginPlayer = "tester";
         passwordPlayer = "passTest";
         transactionId = 1L;
-        LiquibaseManager.runDatabaseMigrations(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword());
-
-        playerRepository = new PlayerRepositoryImpl(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword());
-
-        repository = new TransactionRepositoryImpl(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword());
     }
 
     @AfterAll

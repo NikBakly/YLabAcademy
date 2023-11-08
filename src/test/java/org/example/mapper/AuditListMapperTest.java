@@ -6,13 +6,20 @@ import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Класс для тестирования AuditListMapper
+ */
+@SpringBootTest
 class AuditListMapperTest {
 
-    private final AuditListMapper auditListMapper = new AuditListMapperImpl(new AuditMapperImpl());
+    @Autowired
+    private AuditListMapper auditListMapper;
 
     @Test
     @DisplayName("Преобразование списка объектов Audit в список объектов AuditResponseDto")

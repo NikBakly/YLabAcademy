@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
-import org.example.util.DatabaseConnector;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -21,31 +21,14 @@ public class PlayerRepositoryImpl implements PlayerRepository {
     private static final String SELECT_SQL = "SELECT * FROM wallet.players WHERE login = ?";
     private static final String UPDATE_BALANCE_SQL = "UPDATE wallet.players SET balance = ? WHERE login = ?";
 
-    private final String jdbcUrl;
-    private final String jdbcUsername;
-    private final String jdbcPassword;
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
 
-    /**
-     * Для тестирования
-     *
-     * @param jdbcUrl      url бд
-     * @param jdbcUsername имя пользователя в бд
-     * @param jdbcPassword пароль пользователя в бд
-     */
-    public PlayerRepositoryImpl(String jdbcUrl, String jdbcUsername, String jdbcPassword) {
-        this.jdbcUrl = jdbcUrl;
-        this.jdbcUsername = jdbcUsername;
-        this.jdbcPassword = jdbcPassword;
-    }
+    @Value("${spring.datasource.username}")
+    private String jdbcUsername;
 
-    /**
-     * Берем стандартные настройки
-     */
-    public PlayerRepositoryImpl() {
-        this.jdbcUrl = DatabaseConnector.URL;
-        this.jdbcUsername = DatabaseConnector.USERNAME;
-        this.jdbcPassword = DatabaseConnector.PASSWORD;
-    }
+    @Value("${spring.datasource.password}")
+    private String jdbcPassword;
 
 
     @Override

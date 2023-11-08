@@ -4,11 +4,14 @@ import org.assertj.core.api.Assertions;
 import org.example.domain.model.Player;
 import org.example.exception.SaveEntityException;
 import org.example.util.DatabaseConnector;
-import org.example.util.LiquibaseManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -20,6 +23,7 @@ import java.util.Optional;
  * Класс для тестирования PlayerInMemoryRepository
  */
 @Testcontainers
+@SpringBootTest
 class PlayerRepositoryTest {
 
     @Container
@@ -28,21 +32,19 @@ class PlayerRepositoryTest {
             .withUsername(DatabaseConnector.USERNAME)
             .withPassword(DatabaseConnector.PASSWORD);
 
-    static PlayerRepository repository;
+    @Autowired
+    PlayerRepository repository;
+
+    @DynamicPropertySource
+    static void setDataSourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
+    }
 
     @BeforeAll
     static void init() {
         postgresContainer.start();
-        LiquibaseManager.runDatabaseMigrations(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword());
-
-        repository = new PlayerRepositoryImpl(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword()
-        );
     }
 
     @AfterAll

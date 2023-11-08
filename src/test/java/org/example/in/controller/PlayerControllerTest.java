@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -28,6 +29,10 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 
+/**
+ * Класс для тестирования PlayerController
+ */
+@SpringBootTest
 class PlayerControllerTest {
     private static final Long playerId = 1L;
     private static final String loginPlayer = "login";

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.when;
 /**
  * Класс для тестирования PlayerServiceTest
  */
+@SpringBootTest
 class PlayerServiceTest {
     static Long playerId;
     static String loginPlayer;

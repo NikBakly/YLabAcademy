@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.example.domain.dto.TransactionResponseDto;
 import org.example.domain.model.Transaction;
 import org.example.exception.SaveEntityException;
-import org.example.util.DatabaseConnector;
 import org.example.util.TransactionType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -28,21 +28,14 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     "WHERE player_id = ? AND type = ? " +
                     "ORDER BY created_time";
 
-    private final String jdbcUrl;
-    private final String jdbcUsername;
-    private final String jdbcPassword;
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
 
-    public TransactionRepositoryImpl(String jdbcUrl, String jdbcUsername, String jdbcPassword) {
-        this.jdbcUrl = jdbcUrl;
-        this.jdbcUsername = jdbcUsername;
-        this.jdbcPassword = jdbcPassword;
-    }
+    @Value("${spring.datasource.username}")
+    private String jdbcUsername;
 
-    public TransactionRepositoryImpl() {
-        this.jdbcUrl = DatabaseConnector.URL;
-        this.jdbcUsername = DatabaseConnector.USERNAME;
-        this.jdbcPassword = DatabaseConnector.PASSWORD;
-    }
+    @Value("${spring.datasource.password}")
+    private String jdbcPassword;
 
     @Override
     public void createdTransaction(Transaction newTransaction) throws SaveEntityException {

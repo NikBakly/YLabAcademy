@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.domain.model.Audit;
 import org.example.util.AuditType;
-import org.example.util.DatabaseConnector;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -23,31 +23,15 @@ public class AuditRepositoryImpl implements AuditRepository {
     private static final String SELECT_SQL =
             "SELECT * FROM wallet.audits WHERE player_id = ? ORDER BY created_time";
 
-    private final String jdbcUrl;
-    private final String jdbcUsername;
-    private final String jdbcPassword;
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
 
-    /**
-     * Для тестирования
-     *
-     * @param jdbcUrl      url бд
-     * @param jdbcUsername имя пользователя в бд
-     * @param jdbcPassword пароль пользователя в бд
-     */
-    public AuditRepositoryImpl(String jdbcUrl, String jdbcUsername, String jdbcPassword) {
-        this.jdbcUrl = jdbcUrl;
-        this.jdbcUsername = jdbcUsername;
-        this.jdbcPassword = jdbcPassword;
-    }
+    @Value("${spring.datasource.username}")
+    private String jdbcUsername;
 
-    /**
-     * Берем стандартные настройки
-     */
-    public AuditRepositoryImpl() {
-        this.jdbcUrl = DatabaseConnector.URL;
-        this.jdbcUsername = DatabaseConnector.USERNAME;
-        this.jdbcPassword = DatabaseConnector.PASSWORD;
-    }
+    @Value("${spring.datasource.password}")
+    private String jdbcPassword;
+
 
     @Override
     public void createAudit(AuditType auditType, Long playerId) {

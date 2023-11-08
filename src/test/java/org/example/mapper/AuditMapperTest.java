@@ -6,11 +6,19 @@ import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 
+/**
+ * Класс для тестирования AuditMapper
+ */
+@SpringBootTest
 class AuditMapperTest {
-    private final AuditMapper auditMapper = new AuditMapperImpl();
+
+    @Autowired
+    private AuditMapper auditMapper;
 
 
     @Test

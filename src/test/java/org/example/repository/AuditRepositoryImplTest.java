@@ -4,8 +4,14 @@ import org.assertj.core.api.Assertions;
 import org.example.domain.model.Audit;
 import org.example.util.AuditType;
 import org.example.util.DatabaseConnector;
-import org.example.util.LiquibaseManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,6 +22,7 @@ import java.util.List;
  * Класс для тестирования AuditInMemoryRepository
  */
 @Testcontainers
+@SpringBootTest
 class AuditRepositoryImplTest {
     @Container
     private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:13.3")
@@ -23,24 +30,19 @@ class AuditRepositoryImplTest {
             .withUsername(DatabaseConnector.USERNAME)
             .withPassword(DatabaseConnector.PASSWORD);
 
+    @Autowired
     AuditRepository repository;
+
+    @DynamicPropertySource
+    static void setDataSourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
+    }
 
     @BeforeAll
     static void startContainer() {
         postgresContainer.start();
-    }
-
-    @BeforeEach
-    void init() {
-        LiquibaseManager.runDatabaseMigrations(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword());
-        repository = new AuditRepositoryImpl(
-                postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(),
-                postgresContainer.getPassword()
-        );
     }
 
     @AfterAll

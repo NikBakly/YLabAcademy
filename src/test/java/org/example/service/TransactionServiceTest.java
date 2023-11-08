@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.when;
 /**
  * Класс для тестирования TransactionService
  */
+@SpringBootTest
 class TransactionServiceTest {
     static long transactionId;
     static long playerId;

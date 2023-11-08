@@ -5,11 +5,19 @@ import org.example.domain.dto.PlayerResponseDto;
 import org.example.domain.model.Player;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
+/**
+ * Класс для тестирования PlayerMapper
+ */
+@SpringBootTest
 class PlayerMapperTest {
-    private final PlayerMapper playerMapper = new PlayerMapperImpl();
+
+    @Autowired
+    private PlayerMapper playerMapper;
 
     @Test
     @DisplayName("Преобразование объекта Player в объект PlayerResponseDto")

@@ -81,7 +81,7 @@ public class LoggableServiceAspect {
      */
     @After("annotatedByPlayerServiceImpl()")
     public void addAuditFromPlayerServiceImpl(JoinPoint joinPoint) {
-        if (!checkWorkAspect()) {
+        if (checkAspectForNotWorking()) {
             return;
         }
         String nameMethod = joinPoint.getSignature().getName();
@@ -101,7 +101,7 @@ public class LoggableServiceAspect {
      */
     @After("annotatedByTransactionServiceImpl()")
     public void addAuditFromTransactionServiceImpl(JoinPoint joinPoint) {
-        if (!checkWorkAspect()) {
+        if (checkAspectForNotWorking()) {
             return;
         }
         String nameMethod = joinPoint.getSignature().getName();
@@ -196,13 +196,13 @@ public class LoggableServiceAspect {
     }
 
     /**
-     * Метод проверяет разрешение на работу аспекта
+     * Метод проверяет отключен ли аспект
      *
-     * @return разарешение на работу
+     * @return отвечает отключен ли аспект
      */
-    private boolean checkWorkAspect() {
+    private boolean checkAspectForNotWorking() {
         // Проверяем системное свойство или переменную окружения
         String disableAspect = System.getProperty("disableAspect");
-        return disableAspect == null || !"true".equalsIgnoreCase(disableAspect);
+        return disableAspect == null || "true".equalsIgnoreCase(disableAspect);
     }
 }
